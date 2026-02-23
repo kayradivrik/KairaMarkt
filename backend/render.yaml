@@ -1,0 +1,24 @@
+# Render Blueprint - KairaMarkt Backend
+# https://dashboard.render.com -> New -> Web Service -> Connect repo, root: backend
+services:
+  - type: web
+    name: kairamarkt-api
+    env: node
+    region: frankfurt
+    buildCommand: npm install --legacy-peer-deps
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MONGODB_URI
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: FRONTEND_URL
+        sync: false
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false
