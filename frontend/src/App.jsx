@@ -21,6 +21,9 @@ import OrderDetailPage from './pages/OrderDetailPage';
 import AboutPage from './pages/AboutPage';
 import ContactPage from './pages/ContactPage';
 import TeslimatPage from './pages/TeslimatPage';
+import FaqPage from './pages/FaqPage';
+import CampaignsPage from './pages/CampaignsPage';
+import ReturnPage from './pages/ReturnPage';
 import NotFoundPage from './pages/NotFoundPage';
 import Error500Page from './pages/Error500Page';
 import AdminDashboard from './pages/admin/AdminDashboard';
@@ -52,6 +55,9 @@ export default function App() {
           <Route path="hakkimizda" element={<AboutPage />} />
           <Route path="iletisim" element={<ContactPage />} />
           <Route path="teslimat" element={<TeslimatPage />} />
+          <Route path="sss" element={<FaqPage />} />
+          <Route path="kampanyalar" element={<CampaignsPage />} />
+          <Route path="iade" element={<ReturnPage />} />
           <Route path="500" element={<Error500Page />} />
         </Route>
         <Route path="/admin" element={<AdminLayout />}>

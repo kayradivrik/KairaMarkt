@@ -49,7 +49,9 @@ export const login = async (req, res, next) => {
 };
 
 export const logout = (_req, res) => {
-  res.cookie('token', '', { maxAge: 0, path: '/' });
+  const clearOptions = { maxAge: 0, path: '/' };
+  if (isProduction) Object.assign(clearOptions, { sameSite: 'none', secure: true });
+  res.cookie('token', '', clearOptions);
   res.json({ success: true });
 };
 

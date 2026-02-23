@@ -80,6 +80,14 @@ export default function Navbar() {
             KairaMarkt
           </Link>
 
+          <nav className="hidden md:flex items-center gap-1">
+            <Link to="/urunler" className="px-3 py-2 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-ux">Ürünler</Link>
+            <Link to="/kampanyalar" className="px-3 py-2 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-ux">Kampanyalar</Link>
+            <Link to="/hakkimizda" className="px-3 py-2 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-ux">Hakkımızda</Link>
+            <Link to="/sss" className="px-3 py-2 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-ux">SSS</Link>
+            <Link to="/iletisim" className="px-3 py-2 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-ux">İletişim</Link>
+          </nav>
+
           <form onSubmit={handleSearch} className="hidden md:flex flex-1 max-w-md mx-4">
             <input
               type="search"
@@ -189,6 +197,12 @@ export default function Navbar() {
               <button type="submit" className="rounded-2xl bg-brand-500 text-white px-4 py-2">Ara</button>
             </form>
             <Link to="/urunler" className="block py-2" onClick={() => setOpen(false)}>Ürünler</Link>
+            <Link to="/kampanyalar" className="block py-2" onClick={() => setOpen(false)}>Kampanyalar</Link>
+            <Link to="/hakkimizda" className="block py-2" onClick={() => setOpen(false)}>Hakkımızda</Link>
+            <Link to="/sss" className="block py-2" onClick={() => setOpen(false)}>SSS</Link>
+            <Link to="/teslimat" className="block py-2" onClick={() => setOpen(false)}>Teslimat</Link>
+            <Link to="/iade" className="block py-2" onClick={() => setOpen(false)}>İade</Link>
+            <Link to="/iletisim" className="block py-2" onClick={() => setOpen(false)}>İletişim</Link>
             <Link to="/sepet" className="block py-2" onClick={() => setOpen(false)}>Sepet</Link>
             {user ? (
               <>

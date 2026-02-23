@@ -16,6 +16,7 @@ import cartRoutes from './routes/cartRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
 import campaignRoutes from './routes/campaignRoutes.js';
 import sliderRoutes from './routes/sliderRoutes.js';
+import faqRoutes from './routes/faqRoutes.js';
 
 await connectDB();
 
@@ -70,6 +71,7 @@ app.use('/api/cart', cartRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/campaigns', campaignRoutes);
 app.use('/api/sliders', sliderRoutes);
+app.use('/api/faq', faqRoutes);
 
 app.get('/api/health', (_, res) => res.json({ ok: true }));
 

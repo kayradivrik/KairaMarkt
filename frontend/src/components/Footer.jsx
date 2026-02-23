@@ -22,9 +22,9 @@ export default function Footer() {
           <div>
             <h4 className="text-white font-medium mb-4">Yardım</h4>
             <ul className="space-y-2 text-sm">
-              <li><a href="#" className="hover:text-red-300 transition-colors">SSS</a></li>
-              <li><a href="#" className="hover:text-red-300 transition-colors">İade</a></li>
-              <li><a href="#" className="hover:text-red-300 transition-colors">Teslimat</a></li>
+              <li><Link to="/sss" className="hover:text-red-300 transition-colors">SSS</Link></li>
+              <li><Link to="/iade" className="hover:text-red-300 transition-colors">İade</Link></li>
+              <li><Link to="/teslimat" className="hover:text-red-300 transition-colors">Teslimat</Link></li>
             </ul>
           </div>
           <div>
