@@ -1,10 +1,12 @@
 import User from '../models/User.js';
 import generateToken from '../utils/jwt.js';
 
+const isProduction = process.env.NODE_ENV === 'production';
+
 const cookieOptions = (remember) => ({
   httpOnly: true,
-  secure: process.env.NODE_ENV === 'production',
-  sameSite: 'lax',
+  secure: isProduction,
+  sameSite: isProduction ? 'none' : 'lax',
   maxAge: remember ? 30 * 24 * 60 * 60 * 1000 : 7 * 24 * 60 * 60 * 1000,
   path: '/',
 });
