@@ -24,6 +24,7 @@ import TeslimatPage from './pages/TeslimatPage';
 import FaqPage from './pages/FaqPage';
 import CampaignsPage from './pages/CampaignsPage';
 import ReturnPage from './pages/ReturnPage';
+import ForumPage from './pages/ForumPage';
 import NotFoundPage from './pages/NotFoundPage';
 import Error500Page from './pages/Error500Page';
 import AdminDashboard from './pages/admin/AdminDashboard';
@@ -35,6 +36,7 @@ import AdminReviews from './pages/admin/AdminReviews';
 import AdminCampaigns from './pages/admin/AdminCampaigns';
 import AdminLogs from './pages/admin/AdminLogs';
 import AdminSliders from './pages/admin/AdminSliders';
+import AdminSettings from './pages/admin/AdminSettings';
 
 export default function App() {
   return (
@@ -58,6 +60,8 @@ export default function App() {
           <Route path="sss" element={<FaqPage />} />
           <Route path="kampanyalar" element={<CampaignsPage />} />
           <Route path="iade" element={<ReturnPage />} />
+          <Route path="forum" element={<ForumPage />} />
+          <Route path="forum/konu/:slug" element={<ForumPage />} />
           <Route path="500" element={<Error500Page />} />
         </Route>
         <Route path="/admin" element={<AdminLayout />}>
@@ -71,6 +75,7 @@ export default function App() {
           <Route path="yorumlar" element={<AdminReviews />} />
           <Route path="kampanyalar" element={<AdminCampaigns />} />
           <Route path="loglar" element={<AdminLogs />} />
+          <Route path="ayarlar" element={<AdminSettings />} />
         </Route>
         <Route path="*" element={<NotFoundPage />} />
       </Routes>

@@ -1,18 +1,22 @@
 /**
  * Üst menü - logo, arama, sepet, tema, kullanıcı
- * Scroll'da blur/transparan derinlik; hover 150–200ms easing; debounced arama; mini cart dropdown
+ * Mobil: sağdan açılan drawer, gruplu linkler, scroll kilidi
  * KairaMarkt - Kayra tarafından yapılmıştır
  */
 import { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { Link, useNavigate } from 'react-router-dom';
-import { FiShoppingCart, FiUser, FiMenu, FiX, FiSearch } from 'react-icons/fi';
+import { FiShoppingCart, FiUser, FiMenu, FiX, FiSearch, FiPackage, FiTag, FiHelpCircle, FiTruck, FiLogOut } from 'react-icons/fi';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
+import { useFlyToCart } from '../context/FlyToCartContext';
 import { useTheme } from '../context/ThemeContext';
-// import logoImg from '../assets/logo.svg';
+import { useSettings } from '../context/SettingsContext';
 
 const DEBOUNCE_MS = 350;
 const MINI_CART_AUTO_CLOSE_MS = 4000;
+
+const closeMenu = (setOpen) => () => setOpen(false);
 
 const IconSun = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -36,8 +40,11 @@ export default function Navbar() {
   const debounceRef = useRef(null);
   const { user, isAdmin, logout } = useAuth();
   const { items, itemCount } = useCart();
+  const { cartIconRef } = useFlyToCart() || {};
   const { dark, toggle } = useTheme();
+  const { siteName, logoUrl, showLogo, primaryColor } = useSettings();
   const navigate = useNavigate();
+  const brandColor = primaryColor || '#b91c1c';
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 16);
@@ -62,6 +69,19 @@ export default function Navbar() {
     return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
   }, [searchInput]);
 
+  useEffect(() => {
+    if (!open) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => { document.body.style.overflow = prev; };
+  }, [open]);
+
+  useEffect(() => {
+    const onKeyDown = (e) => { if (e.key === 'Escape') setOpen(false); };
+    if (open) window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [open]);
+
   const handleSearch = (e) => {
     e.preventDefault();
     const q = (searchInput || search).trim();
@@ -76,8 +96,14 @@ export default function Navbar() {
     <header className={`sticky top-0 z-50 ${headerBg} shadow-soft transition-ux duration-200`}>
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between min-h-[72px] md:min-h-24 py-2">
-          <Link to="/" className="flex items-center gap-3 text-lg md:text-xl font-extrabold text-red-600 dark:text-red-400 tracking-tight hover:opacity-90 transition-ux">
-            KairaMarkt
+          <Link to="/" className="flex items-center gap-3 text-lg md:text-xl font-extrabold tracking-tight hover:opacity-90 transition-ux shrink-0" style={{ color: brandColor }}>
+            {showLogo && logoUrl ? (
+              <span className="flex h-14 md:h-[4.5rem] shrink-0 items-center" style={{ minHeight: 56 }}>
+                <img src={logoUrl} alt={siteName} className="h-full w-auto max-w-[220px] object-contain" style={{ minHeight: 48 }} />
+              </span>
+            ) : (
+              siteName || 'KairaMarkt'
+            )}
           </Link>
 
           <nav className="hidden md:flex items-center gap-1">
@@ -85,6 +111,7 @@ export default function Navbar() {
             <Link to="/kampanyalar" className="px-3 py-2 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-ux">Kampanyalar</Link>
             <Link to="/hakkimizda" className="px-3 py-2 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-ux">Hakkımızda</Link>
             <Link to="/sss" className="px-3 py-2 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-ux">SSS</Link>
+            <Link to="/forum" className="px-3 py-2 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-ux">Forum</Link>
             <Link to="/iletisim" className="px-3 py-2 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-ux">İletişim</Link>
           </nav>
 
@@ -94,9 +121,9 @@ export default function Navbar() {
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
               placeholder="Ne aramıştın?"
-              className="w-full rounded-2xl rounded-r-none border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 px-4 py-2 text-sm focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-ux"
+              className="w-full rounded-2xl rounded-r-none border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 px-4 py-2 text-sm focus:ring-2 focus:ring-theme focus:border-transparent transition-ux"
             />
-            <button type="submit" className="rounded-2xl rounded-l-none bg-brand-500 text-white px-4 py-2 hover:bg-brand-600 transition-ux">
+            <button type="submit" className="rounded-2xl rounded-l-none btn-theme px-4 py-2 transition-ux">
               <FiSearch className="w-5 h-5" />
             </button>
           </form>
@@ -115,10 +142,10 @@ export default function Navbar() {
               onMouseEnter={() => setMiniCartOpen(true)}
               onMouseLeave={() => setMiniCartOpen(false)}
             >
-              <Link to="/sepet" className="relative p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 inline-flex transition-ux">
+              <Link to="/sepet" ref={cartIconRef} className="relative p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 inline-flex transition-ux">
                 <FiShoppingCart className="w-6 h-6" />
                 {itemCount > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 bg-red-600 text-white text-xs min-w-[20px] h-5 px-1 rounded-full font-semibold flex items-center justify-center">
+                  <span className="absolute -top-0.5 -right-0.5 bg-theme text-white text-xs min-w-[20px] h-5 px-1 rounded-full font-semibold flex items-center justify-center">
                     {itemCount > 99 ? '99+' : itemCount}
                   </span>
                 )}
@@ -137,13 +164,13 @@ export default function Navbar() {
                         </div>
                         <div className="min-w-0 flex-1">
                           <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{p?.name}</p>
-                          <p className="text-xs text-red-600 dark:text-red-400">{quantity} × {(p?.discountPrice ?? p?.price)?.toLocaleString('tr-TR')} ₺</p>
+                          <p className="text-xs text-theme">{quantity} × {(p?.discountPrice ?? p?.price)?.toLocaleString('tr-TR')} ₺</p>
                         </div>
                       </li>
                     ))}
                   </ul>
                   <div className="px-3 pt-2 border-t border-gray-100 dark:border-gray-700">
-                    <Link to="/sepet" className="block w-full py-2.5 text-center bg-red-600 text-white font-semibold rounded-xl hover:bg-red-700 transition-ux text-sm">
+                    <Link to="/sepet" className="block w-full py-2.5 text-center btn-theme font-semibold rounded-xl transition-ux text-sm">
                       Sepete git
                     </Link>
                   </div>
@@ -168,54 +195,181 @@ export default function Navbar() {
                       Admin
                     </Link>
                   )}
-                  <button onClick={() => logout()} className="w-full text-left px-4 py-2 text-sm text-brand-600 hover:bg-gray-100 dark:hover:bg-gray-700">
+                  <button onClick={() => logout()} className="w-full text-left px-4 py-2 text-sm text-theme hover:bg-gray-100 dark:hover:bg-gray-700">
                     Çıkış
                   </button>
                 </div>
               </div>
             ) : (
-              <Link to="/giris" className="hidden md:inline-flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-2xl hover:bg-red-700 text-sm font-semibold transition-ux">
+              <Link to="/giris" className="hidden md:inline-flex items-center gap-2 px-4 py-2 btn-theme rounded-2xl text-sm font-semibold transition-ux">
                 <FiUser /> Giriş
               </Link>
             )}
-            <button className="md:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-ux" onClick={() => setOpen(!open)}>
+            <button
+              type="button"
+              className="md:hidden relative z-[100] p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-ux"
+              onClick={() => setOpen(!open)}
+              aria-label={open ? 'Menüyü kapat' : 'Menüyü aç'}
+              aria-expanded={open}
+            >
               {open ? <FiX className="w-6 h-6" /> : <FiMenu className="w-6 h-6" />}
             </button>
           </div>
         </div>
 
-        {open && (
-          <div className="md:hidden py-4 border-t border-gray-200 dark:border-gray-700">
-            <form onSubmit={handleSearch} className="flex gap-2 mb-4">
-              <input
-                type="search"
-                value={searchInput}
-                onChange={(e) => setSearchInput(e.target.value)}
-                placeholder="Ürün ara..."
-                className="flex-1 rounded border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 px-3 py-2 text-sm"
+        {/* Mobil: overlay + drawer portal ile body'e, böylece üstte ve tıklanabilir kalır */}
+        {typeof document !== 'undefined' &&
+          createPortal(
+            <div className="md:hidden">
+              <div
+                role="presentation"
+                className={`fixed inset-0 z-[9998] bg-black/50 backdrop-blur-sm transition-opacity duration-200 ${
+                  open ? 'opacity-100' : 'opacity-0 pointer-events-none'
+                }`}
+                onClick={() => setOpen(false)}
+                aria-hidden="true"
               />
-              <button type="submit" className="rounded-2xl bg-brand-500 text-white px-4 py-2">Ara</button>
+              <aside
+                aria-modal="true"
+                aria-label="Menü"
+                className={`fixed top-0 right-0 z-[9999] h-full w-full max-w-[300px] bg-white dark:bg-gray-900 shadow-2xl flex flex-col transition-transform duration-200 ease-out ${
+                  open ? 'translate-x-0' : 'translate-x-full'
+                }`}
+                style={{ paddingTop: 'env(safe-area-inset-top)', paddingBottom: 'env(safe-area-inset-bottom)' }}
+              >
+            <div className="flex items-center justify-between px-4 py-4 border-b border-gray-200 dark:border-gray-700 shrink-0">
+              <span className="text-lg font-bold text-theme">Menü</span>
+              <button
+                type="button"
+                onClick={() => setOpen(false)}
+                className="p-3 -m-3 rounded-xl text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 active:scale-95 transition-ux"
+                aria-label="Menüyü kapat"
+              >
+                <FiX className="w-6 h-6" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSearch} className="px-4 pt-4 pb-2 shrink-0">
+              <div className="flex gap-2">
+                <input
+                  type="search"
+                  value={searchInput}
+                  onChange={(e) => setSearchInput(e.target.value)}
+                  placeholder="Ürün ara..."
+                  className="flex-1 min-w-0 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 px-4 py-3 text-base"
+                />
+                <button type="submit" className="rounded-xl btn-theme px-4 py-3 shrink-0" aria-label="Ara">
+                  <FiSearch className="w-5 h-5" />
+                </button>
+              </div>
             </form>
-            <Link to="/urunler" className="block py-2" onClick={() => setOpen(false)}>Ürünler</Link>
-            <Link to="/kampanyalar" className="block py-2" onClick={() => setOpen(false)}>Kampanyalar</Link>
-            <Link to="/hakkimizda" className="block py-2" onClick={() => setOpen(false)}>Hakkımızda</Link>
-            <Link to="/sss" className="block py-2" onClick={() => setOpen(false)}>SSS</Link>
-            <Link to="/teslimat" className="block py-2" onClick={() => setOpen(false)}>Teslimat</Link>
-            <Link to="/iade" className="block py-2" onClick={() => setOpen(false)}>İade</Link>
-            <Link to="/iletisim" className="block py-2" onClick={() => setOpen(false)}>İletişim</Link>
-            <Link to="/sepet" className="block py-2" onClick={() => setOpen(false)}>Sepet</Link>
-            {user ? (
-              <>
-                <Link to="/profil" className="block py-2" onClick={() => setOpen(false)}>Profil</Link>
-                <Link to="/siparislerim" className="block py-2" onClick={() => setOpen(false)}>Siparişlerim</Link>
-                {isAdmin && <Link to="/admin" className="block py-2" onClick={() => setOpen(false)}>Admin</Link>}
-                <button onClick={() => { logout(); setOpen(false); }} className="block py-2 text-brand-600">Çıkış</button>
-              </>
-            ) : (
-              <Link to="/giris" className="block py-2" onClick={() => setOpen(false)}>Giriş</Link>
-            )}
-          </div>
-        )}
+
+            <nav className="flex-1 overflow-y-auto overscroll-contain px-2 py-4">
+              <div className="mb-6">
+                <p className="px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Alışveriş</p>
+                <ul className="space-y-0.5">
+                  <li>
+                    <Link to="/urunler" onClick={closeMenu(setOpen)} className="flex items-center gap-3 px-4 py-3.5 rounded-xl text-gray-800 dark:text-gray-200 font-medium active:bg-gray-100 dark:active:bg-gray-800 transition-colors">
+                      <FiPackage className="w-5 h-5 text-theme shrink-0" /> Ürünler
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to="/kampanyalar" onClick={closeMenu(setOpen)} className="flex items-center gap-3 px-4 py-3.5 rounded-xl text-gray-800 dark:text-gray-200 font-medium active:bg-gray-100 dark:active:bg-gray-800 transition-colors">
+                      <FiTag className="w-5 h-5 text-theme shrink-0" /> Kampanyalar
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to="/sepet" onClick={closeMenu(setOpen)} className="flex items-center gap-3 px-4 py-3.5 rounded-xl text-gray-800 dark:text-gray-200 font-medium active:bg-gray-100 dark:active:bg-gray-800 transition-colors">
+                      <FiShoppingCart className="w-5 h-5 text-theme shrink-0" />
+                      Sepet
+                      {itemCount > 0 && (
+                        <span className="ml-auto bg-theme text-white text-xs font-bold min-w-[22px] h-6 px-1.5 rounded-full flex items-center justify-center">
+                          {itemCount > 99 ? '99+' : itemCount}
+                        </span>
+                      )}
+                    </Link>
+                  </li>
+                </ul>
+              </div>
+
+              <div className="mb-6">
+                <p className="px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Yardım & Bilgi</p>
+                <ul className="space-y-0.5">
+                  <li>
+                    <Link to="/hakkimizda" onClick={closeMenu(setOpen)} className="flex items-center gap-3 px-4 py-3.5 rounded-xl text-gray-800 dark:text-gray-200 font-medium active:bg-gray-100 dark:active:bg-gray-800 transition-colors">
+                      Hakkımızda
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to="/sss" onClick={closeMenu(setOpen)} className="flex items-center gap-3 px-4 py-3.5 rounded-xl text-gray-800 dark:text-gray-200 font-medium active:bg-gray-100 dark:active:bg-gray-800 transition-colors">
+                      <FiHelpCircle className="w-5 h-5 text-gray-400 shrink-0" /> SSS
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to="/forum" onClick={closeMenu(setOpen)} className="flex items-center gap-3 px-4 py-3.5 rounded-xl text-gray-800 dark:text-gray-200 font-medium active:bg-gray-100 dark:active:bg-gray-800 transition-colors">
+                      Forum
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to="/teslimat" onClick={closeMenu(setOpen)} className="flex items-center gap-3 px-4 py-3.5 rounded-xl text-gray-800 dark:text-gray-200 font-medium active:bg-gray-100 dark:active:bg-gray-800 transition-colors">
+                      <FiTruck className="w-5 h-5 text-gray-400 shrink-0" /> Teslimat
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to="/iade" onClick={closeMenu(setOpen)} className="flex items-center gap-3 px-4 py-3.5 rounded-xl text-gray-800 dark:text-gray-200 font-medium active:bg-gray-100 dark:active:bg-gray-800 transition-colors">
+                      İade
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to="/iletisim" onClick={closeMenu(setOpen)} className="flex items-center gap-3 px-4 py-3.5 rounded-xl text-gray-800 dark:text-gray-200 font-medium active:bg-gray-100 dark:active:bg-gray-800 transition-colors">
+                      İletişim
+                    </Link>
+                  </li>
+                </ul>
+              </div>
+
+              <div>
+                <p className="px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Hesap</p>
+                <ul className="space-y-0.5">
+                  {user ? (
+                    <>
+                      <li>
+                        <Link to="/profil" onClick={closeMenu(setOpen)} className="flex items-center gap-3 px-4 py-3.5 rounded-xl text-gray-800 dark:text-gray-200 font-medium active:bg-gray-100 dark:active:bg-gray-800 transition-colors">
+                          <FiUser className="w-5 h-5 text-gray-400 shrink-0" /> {user.name}
+                        </Link>
+                      </li>
+                      <li>
+                        <Link to="/siparislerim" onClick={closeMenu(setOpen)} className="flex items-center gap-3 px-4 py-3.5 rounded-xl text-gray-800 dark:text-gray-200 font-medium active:bg-gray-100 dark:active:bg-gray-800 transition-colors">
+                          Siparişlerim
+                        </Link>
+                      </li>
+                      {isAdmin && (
+                        <li>
+                          <Link to="/admin" onClick={closeMenu(setOpen)} className="flex items-center gap-3 px-4 py-3.5 rounded-xl text-theme font-medium active:bg-theme-subtle transition-colors">
+                            Admin Paneli
+                          </Link>
+                        </li>
+                      )}
+                      <li>
+                        <button type="button" onClick={() => { logout(); setOpen(false); }} className="flex w-full items-center gap-3 px-4 py-3.5 rounded-xl text-theme font-medium active:bg-theme-subtle transition-colors text-left">
+                          <FiLogOut className="w-5 h-5 shrink-0" /> Çıkış
+                        </button>
+                      </li>
+                    </>
+                  ) : (
+                    <li>
+                      <Link to="/giris" onClick={closeMenu(setOpen)} className="flex items-center gap-3 px-4 py-3.5 rounded-xl btn-theme font-semibold transition-colors">
+                        <FiUser className="w-5 h-5 shrink-0" /> Giriş yap
+                      </Link>
+                    </li>
+                  )}
+                </ul>
+              </div>
+            </nav>
+              </aside>
+            </div>,
+            document.body
+          )}
       </div>
     </header>
   );

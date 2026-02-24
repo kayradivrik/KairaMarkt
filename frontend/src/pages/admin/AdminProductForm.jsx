@@ -25,7 +25,10 @@ export default function AdminProductForm() {
 
   const initial = product || {
     name: '', description: '', price: '', discountPrice: '', stock: '', brand: '', category: 'Telefon', subCategory: '', featured: false, isActive: true, images: [],
+    technicalSpecs: [{ name: '', value: '' }],
   };
+  if (initial.technicalSpecs == null || !Array.isArray(initial.technicalSpecs)) initial.technicalSpecs = [{ name: '', value: '' }];
+  if (initial.technicalSpecs.length === 0) initial.technicalSpecs = [{ name: '', value: '' }];
 
   return (
     <div>
@@ -47,13 +50,22 @@ export default function AdminProductForm() {
               form.append('subCategory', values.subCategory || '');
               form.append('featured', values.featured ? 'true' : 'false');
               form.append('isActive', values.isActive !== false ? 'true' : 'false');
+              const specs = (values.technicalSpecs || []).filter((s) => (s?.name ?? '').trim() || (s?.value ?? '').trim());
+              form.append('technicalSpecs', JSON.stringify(specs.map((s) => ({ name: (s?.name ?? '').trim(), value: (s?.value ?? '').trim() }))));
               if (values.images?.length && values.images[0]?.file) {
                 for (const item of values.images) if (item?.file) form.append('images', item.file);
               }
               await createProduct(form);
               toast.success('Ürün eklendi');
             } else {
-              await updateAdminProduct(id, { ...values, price: Number(values.price), discountPrice: values.discountPrice ? Number(values.discountPrice) : null, stock: Number(values.stock) });
+              const specs = (values.technicalSpecs || []).filter((s) => (s?.name ?? '').trim() || (s?.value ?? '').trim());
+              await updateAdminProduct(id, {
+                ...values,
+                price: Number(values.price),
+                discountPrice: values.discountPrice ? Number(values.discountPrice) : null,
+                stock: Number(values.stock),
+                technicalSpecs: specs.map((s) => ({ name: (s?.name ?? '').trim(), value: (s?.value ?? '').trim() })),
+              });
               toast.success('Ürün güncellendi');
             }
             navigate('/admin/urunler');
@@ -113,6 +125,18 @@ export default function AdminProductForm() {
             <div className="flex gap-4">
               <label className="flex items-center gap-2"><Field name="featured" type="checkbox" /> Öne çıkan</label>
               <label className="flex items-center gap-2"><Field name="isActive" type="checkbox" /> Aktif</label>
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Teknik özellikler</label>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">Örn: Ekran boyutu, RAM, depolama</p>
+              {(values.technicalSpecs || []).map((_, i) => (
+                <div key={i} className="flex gap-2 mb-2">
+                  <Field name={`technicalSpecs.${i}.name`} placeholder="Özellik adı" className="flex-1 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm" />
+                  <Field name={`technicalSpecs.${i}.value`} placeholder="Değer" className="flex-1 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm" />
+                  <button type="button" onClick={() => setFieldValue('technicalSpecs', values.technicalSpecs.filter((_, j) => j !== i).length ? values.technicalSpecs.filter((_, j) => j !== i) : [{ name: '', value: '' }])} className="px-2 py-1 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded">Sil</button>
+                </div>
+              ))}
+              <button type="button" onClick={() => setFieldValue('technicalSpecs', [...(values.technicalSpecs || []), { name: '', value: '' }])} className="text-sm text-brand-600 dark:text-brand-400 font-medium">+ Özellik ekle</button>
             </div>
             {!isNew && values.images?.length > 0 && (
               <div>

@@ -24,3 +24,6 @@ export const getSliders = () => admin.get('/admin/sliders');
 export const createSlider = (data) => admin.post('/admin/sliders', data);
 export const updateSlider = (id, data) => admin.put(`/admin/sliders/${id}`, data);
 export const deleteSlider = (id) => admin.delete(`/admin/sliders/${id}`);
+export const getSettings = () => admin.get('/admin/settings');
+export const updateSettings = (data) => admin.put('/admin/settings', data);
+export const uploadLogo = (formData) => admin.post('/admin/settings/logo', formData);

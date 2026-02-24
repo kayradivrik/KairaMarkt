@@ -140,7 +140,7 @@ export default function ProductListPage() {
           </div>
         </aside>
         <div className="flex-1">
-          {search && <p className="text-gray-600 dark:text-gray-400 mb-4">Arama: &quot;{search}&quot; ({total} sonuç)</p>}
+          {search && <p className="mb-4">Arama: <span className="text-theme font-medium">&quot;{search}&quot;</span> <span className="text-gray-600 dark:text-gray-400">({total} sonuç)</span></p>}
           {loading ? (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {[...Array(8)].map((_, i) => <ProductCardSkeleton key={i} />)}

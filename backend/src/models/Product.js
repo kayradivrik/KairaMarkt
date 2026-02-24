@@ -18,6 +18,7 @@ const productSchema = new mongoose.Schema(
     category: { type: String, required: true },
     subCategory: { type: String, default: '' },
     images: [{ type: String }],
+    technicalSpecs: [{ name: { type: String, default: '' }, value: { type: String, default: '' } }],
     rating: { type: Number, default: 0, min: 0, max: 5 },
     reviewCount: { type: Number, default: 0 },
     salesCount: { type: Number, default: 0 },

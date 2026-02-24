@@ -4,6 +4,7 @@ import toast from 'react-hot-toast';
 import { getProductBySlug, getProductById, getProducts } from '../services/productService';
 import { getReviews, createReview, updateReview, deleteReview } from '../services/reviewService';
 import { useCart } from '../context/CartContext';
+import { useFlyToCart } from '../context/FlyToCartContext';
 import { useAuth } from '../context/AuthContext';
 import { useRecentlyViewed } from '../hooks/useRecentlyViewed';
 import { useWishlist } from '../hooks/useWishlist';
@@ -24,6 +25,7 @@ export default function ProductDetailPage() {
   const [similarProducts, setSimilarProducts] = useState([]);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const { addItem } = useCart();
+  const fly = useFlyToCart();
   const { user } = useAuth();
   const { add: addRecent } = useRecentlyViewed();
   const { has, toggle } = useWishlist();
@@ -63,7 +65,7 @@ export default function ProductDetailPage() {
     return (
       <div className="container mx-auto px-4 py-12 text-center">
         <p className="text-gray-600 dark:text-gray-400">Ürün bulunamadı.</p>
-        <Link to="/urunler" className="mt-4 inline-block text-red-600 font-semibold hover:underline">Ürünlere dön</Link>
+        <Link to="/urunler" className="mt-4 inline-block text-theme font-semibold hover:underline">Ürünlere dön</Link>
       </div>
     );
   }
@@ -71,9 +73,15 @@ export default function ProductDetailPage() {
   const price = product.discountPrice ?? product.price;
   const hasDiscount = product.discountPrice != null;
 
-  const handleAddCart = () => {
-    addItem(product, 1);
-    toast.success('Sepete eklendi');
+  const handleAddCart = (e) => {
+    const rect = e?.currentTarget?.getBoundingClientRect?.();
+    if (fly?.addItemWithFly && product?.images?.[0] && rect) {
+      fly.addItemWithFly(product, 1, rect);
+      toast.success('Sepete eklendi');
+    } else {
+      addItem(product, 1);
+      toast.success('Sepete eklendi');
+    }
   };
 
   const handleReviewSubmit = (values) => {
@@ -119,13 +127,13 @@ export default function ProductDetailPage() {
               <div className="w-full h-full flex items-center justify-center text-gray-400">Görsel yok</div>
             )}
             <button type="button" onClick={() => toggle(product._id)} className="absolute top-4 right-4 p-2 rounded-full bg-white/90 dark:bg-gray-800/90 transition-ux hover:scale-105">
-              <FiHeart className={`w-6 h-6 ${has(product._id) ? 'fill-red-500 text-red-500' : ''}`} />
+              <FiHeart className={`w-6 h-6 ${has(product._id) ? 'fill-theme text-theme' : ''}`} />
             </button>
           </div>
           {images.length > 1 && (
             <div className="flex gap-2 overflow-x-auto pb-1">
               {images.map((img, i) => (
-                <button key={i} type="button" onClick={() => setSelectedImageIndex(i)} className={`flex-shrink-0 w-14 h-14 rounded-lg overflow-hidden border-2 transition-ux ${selectedImageIndex === i ? 'border-red-500 ring-1 ring-red-200' : 'border-gray-200 dark:border-gray-600'}`}>
+                <button key={i} type="button" onClick={() => setSelectedImageIndex(i)} className={`flex-shrink-0 w-14 h-14 rounded-lg overflow-hidden border-2 transition-ux ${selectedImageIndex === i ? 'border-theme ring-1 ring-theme-subtle' : 'border-gray-200 dark:border-gray-600'}`}>
                   <img src={img} alt="" className="w-full h-full object-contain bg-gray-100 dark:bg-gray-700" />
                 </button>
               ))}
@@ -137,7 +145,7 @@ export default function ProductDetailPage() {
           {product.brand && <p className="text-gray-500 dark:text-gray-400 mt-1">{product.brand}</p>}
           <div className="flex items-center gap-4 mt-4">
             {hasDiscount && <span className="text-gray-500 line-through">{product.price?.toLocaleString('tr-TR')} ₺</span>}
-            <span className="text-2xl font-bold text-red-600">{price?.toLocaleString('tr-TR')} ₺</span>
+            <span className="text-2xl font-bold text-theme">{price?.toLocaleString('tr-TR')} ₺</span>
           </div>
           {product.rating > 0 && <p className="mt-2 text-gray-600 dark:text-gray-400">★ {product.rating?.toFixed(1)} ({product.reviewCount} yorum)</p>}
           <div className="mt-3 flex items-center gap-2">
@@ -150,7 +158,22 @@ export default function ProductDetailPage() {
             <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 mb-1">Ürün açıklaması</h3>
             <p className="text-gray-700 dark:text-gray-300 whitespace-pre-line leading-relaxed">{product.description || 'Bu ürün için henüz açıklama eklenmemiş.'}</p>
           </div>
-          <button onClick={handleAddCart} disabled={stockNum === 0} className="mt-6 w-full md:w-auto px-8 py-3 bg-red-600 text-white font-bold rounded-2xl hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-ux">
+          {product.technicalSpecs?.length > 0 && (
+            <div className="mt-4">
+              <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 mb-2">Teknik özellikler</h3>
+              <table className="w-full text-sm border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+                <tbody>
+                  {product.technicalSpecs.filter((s) => (s?.name ?? '').trim() || (s?.value ?? '').trim()).map((s, i) => (
+                    <tr key={i} className="border-b border-gray-200 dark:border-gray-700 last:border-0">
+                      <td className="px-3 py-2 bg-gray-50 dark:bg-gray-800 font-medium text-gray-700 dark:text-gray-300">{s.name || '—'}</td>
+                      <td className="px-3 py-2 text-gray-600 dark:text-gray-400">{s.value || '—'}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+          <button type="button" onClick={handleAddCart} disabled={stockNum === 0} className="mt-6 w-full md:w-auto px-8 py-3 btn-theme font-bold rounded-2xl disabled:opacity-50 disabled:cursor-not-allowed transition-ux">
             Sepete Ekle
           </button>
         </div>
@@ -181,7 +204,7 @@ export default function ProductDetailPage() {
                     </div>
                     <Field as="textarea" name="comment" rows={3} className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2" placeholder="Yorum" />
                     <div className="flex gap-2">
-                      <button type="submit" className="px-4 py-2 bg-brand-500 text-white rounded-2xl">Güncelle</button>
+                      <button type="submit" className="px-4 py-2 btn-theme rounded-2xl">Güncelle</button>
                       <button type="reset" className="px-4 py-2 border rounded">İptal</button>
                     </div>
                   </Form>
@@ -191,8 +214,8 @@ export default function ProductDetailPage() {
               <div className="p-4 bg-gray-100 dark:bg-gray-800 rounded-lg">
                 <p>★ {myReview.rating} – {myReview.comment || '(yorum yok)'}</p>
                 <div className="mt-2 flex gap-2">
-                  <button type="button" onClick={() => setReviewForm({ reviewId: myReview._id })} className="text-sm text-brand-600">Düzenle</button>
-                  <button type="button" onClick={() => handleDeleteReview(myReview._id)} className="text-sm text-brand-600">Sil</button>
+                  <button type="button" onClick={() => setReviewForm({ reviewId: myReview._id })} className="text-sm text-theme">Düzenle</button>
+                  <button type="button" onClick={() => handleDeleteReview(myReview._id)} className="text-sm text-theme">Sil</button>
                 </div>
               </div>
             )}
@@ -206,7 +229,7 @@ export default function ProductDetailPage() {
                   {[1, 2, 3, 4, 5].map((n) => <option key={n} value={n}>{n} yıldız</option>)}
                 </Field>
                 <Field as="textarea" name="comment" rows={3} className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2" placeholder="Yorum (sadece satın aldıysanız yorum yapabilirsiniz)" />
-                <button type="submit" className="px-4 py-2 bg-brand-500 text-white rounded-2xl text-sm">Gönder</button>
+                <button type="submit" className="px-4 py-2 btn-theme rounded-2xl text-sm">Gönder</button>
               </Form>
             )}
           </Formik>

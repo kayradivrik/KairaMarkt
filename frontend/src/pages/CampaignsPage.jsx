@@ -39,7 +39,7 @@ export default function CampaignsPage() {
         <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-8 text-center">
           <FiTag className="w-12 h-12 text-gray-400 mx-auto mb-3" />
           <p className="text-gray-500 dark:text-gray-400">Şu an aktif kampanya bulunmuyor.</p>
-          <Link to="/urunler" className="inline-block mt-4 text-red-600 dark:text-red-400 font-medium hover:underline">
+          <Link to="/urunler" className="inline-block mt-4 text-theme font-medium hover:underline">
             Ürünlere göz at →
           </Link>
         </div>
@@ -79,7 +79,7 @@ export default function CampaignsPage() {
               </div>
               <Link
                 to="/sepet"
-                className="mt-4 inline-block text-sm font-medium text-red-600 dark:text-red-400 hover:underline"
+                className="mt-4 inline-block text-sm font-medium text-theme hover:underline"
               >
                 Sepete git ve kullan →
               </Link>
@@ -91,7 +91,7 @@ export default function CampaignsPage() {
       <div className="mt-10 text-center">
         <Link
           to="/odeme"
-          className="inline-flex items-center gap-2 px-5 py-2.5 bg-red-600 text-white font-semibold rounded-xl hover:bg-red-700 transition-ux"
+          className="inline-flex items-center gap-2 px-5 py-2.5 btn-theme font-semibold rounded-xl transition-ux"
         >
           Ödeme sayfasında kupon gir
         </Link>

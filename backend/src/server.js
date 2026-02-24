@@ -17,6 +17,8 @@ import adminRoutes from './routes/adminRoutes.js';
 import campaignRoutes from './routes/campaignRoutes.js';
 import sliderRoutes from './routes/sliderRoutes.js';
 import faqRoutes from './routes/faqRoutes.js';
+import forumRoutes from './routes/forumRoutes.js';
+import settingsRoutes from './routes/settingsRoutes.js';
 
 await connectDB();
 
@@ -41,10 +43,10 @@ app.use(express.urlencoded({ extended: true, limit: '500kb' }));
 app.use(cookieParser());
 app.use(mongoSanitize());
 
-// Genel API: dakikada ~30 istek civarı (15 dk'da 300). Health sayılmaz.
+// Genel API: geliştirmede yüksek limit (StrictMode + çok endpoint), production'da makul limit.
 const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 300,
+  max: process.env.NODE_ENV === 'production' ? 500 : 2000,
   message: { success: false, message: 'Çok fazla istek. Lütfen bir dakika bekleyin.' },
   standardHeaders: true,
   legacyHeaders: false,
@@ -72,6 +74,8 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/campaigns', campaignRoutes);
 app.use('/api/sliders', sliderRoutes);
 app.use('/api/faq', faqRoutes);
+app.use('/api/forum', forumRoutes);
+app.use('/api/settings', settingsRoutes);
 
 app.get('/api/health', (_, res) => res.json({ ok: true }));
 

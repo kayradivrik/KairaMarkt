@@ -1,6 +1,6 @@
 import express from 'express';
 import { protect, adminOnly } from '../middlewares/auth.js';
-import upload from '../middlewares/upload.js';
+import upload, { uploadLogo as uploadLogoMiddleware } from '../middlewares/upload.js';
 import {
   getDashboard,
   getSalesChart,
@@ -24,6 +24,9 @@ import {
   createSlider,
   updateSlider,
   deleteSlider,
+  getSettings,
+  updateSettings,
+  uploadLogo as uploadLogoHandler,
 } from '../controllers/adminController.js';
 
 const router = express.Router();
@@ -57,5 +60,9 @@ router.get('/sliders', getSliders);
 router.post('/sliders', createSlider);
 router.put('/sliders/:id', updateSlider);
 router.delete('/sliders/:id', deleteSlider);
+
+router.get('/settings', getSettings);
+router.put('/settings', updateSettings);
+router.post('/settings/logo', uploadLogoMiddleware.single('logo'), uploadLogoHandler);
 
 export default router;

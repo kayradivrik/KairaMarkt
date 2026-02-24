@@ -8,6 +8,7 @@ import { useAuth } from '../context/AuthContext';
 import { createOrder } from '../services/orderService';
 import { validateCoupon } from '../services/campaignService';
 import ProtectedRoute from '../components/ProtectedRoute';
+import OrderSuccessCelebration from '../components/OrderSuccessCelebration';
 
 const schema = Yup.object({
   fullName: Yup.string().required('Ad soyad gerekli'),
@@ -20,10 +21,12 @@ const schema = Yup.object({
 
 function CheckoutForm() {
   const navigate = useNavigate();
-  const { items, subtotal, tax, clearCart, setCart } = useCart();
+  const { items, subtotal, tax, clearCart } = useCart();
   const [couponCode, setCouponCode] = useState('');
   const [couponDiscount, setCouponDiscount] = useState(0);
   const [validatingCoupon, setValidatingCoupon] = useState(false);
+  const [showCelebration, setShowCelebration] = useState(false);
+  const [orderId, setOrderId] = useState(null);
 
   const totalWithoutCoupon = subtotal + tax;
   const total = Math.max(0, totalWithoutCoupon - couponDiscount);
@@ -55,8 +58,16 @@ function CheckoutForm() {
   if (items.length === 0) return null;
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold mb-6">Ödeme (Simülasyon)</h1>
+    <>
+      <OrderSuccessCelebration
+        visible={showCelebration}
+        onComplete={() => {
+          setShowCelebration(false);
+          if (orderId) navigate(`/siparislerim/${orderId}`);
+        }}
+      />
+      <div className="container mx-auto px-4 py-8">
+        <h1 className="text-2xl font-bold mb-6">Ödeme (Simülasyon)</h1>
       <Formik
         initialValues={{
           fullName: '',
@@ -75,8 +86,8 @@ function CheckoutForm() {
               couponCode: couponDiscount > 0 ? couponCode : undefined,
             });
             clearCart();
-            toast.success('Siparişiniz alındı');
-            navigate(`/siparislerim/${order.data.order._id}`);
+            setOrderId(order.data.order._id);
+            setShowCelebration(true);
           } catch (err) {
             toast.error(err.message || 'Sipariş oluşturulamadı');
           }
@@ -89,27 +100,27 @@ function CheckoutForm() {
               <div>
                 <label className="block text-sm font-medium mb-1">Ad Soyad</label>
                 <Field name="fullName" className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2" />
-                {errors.fullName && touched.fullName && <p className="text-brand-600 text-sm">{errors.fullName}</p>}
+                {errors.fullName && touched.fullName && <p className="text-theme text-sm">{errors.fullName}</p>}
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">Telefon</label>
                 <Field name="phone" type="tel" className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2" />
-                {errors.phone && touched.phone && <p className="text-brand-600 text-sm">{errors.phone}</p>}
+                {errors.phone && touched.phone && <p className="text-theme text-sm">{errors.phone}</p>}
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">Şehir</label>
                 <Field name="city" className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2" />
-                {errors.city && touched.city && <p className="text-brand-600 text-sm">{errors.city}</p>}
+                {errors.city && touched.city && <p className="text-theme text-sm">{errors.city}</p>}
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">İlçe</label>
                 <Field name="district" className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2" />
-                {errors.district && touched.district && <p className="text-brand-600 text-sm">{errors.district}</p>}
+                {errors.district && touched.district && <p className="text-theme text-sm">{errors.district}</p>}
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">Adres</label>
                 <Field as="textarea" name="fullAddress" rows={3} className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2" />
-                {errors.fullAddress && touched.fullAddress && <p className="text-brand-600 text-sm">{errors.fullAddress}</p>}
+                {errors.fullAddress && touched.fullAddress && <p className="text-theme text-sm">{errors.fullAddress}</p>}
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">Posta kodu</label>
@@ -134,13 +145,14 @@ function CheckoutForm() {
                   {couponDiscount > 0 && <div className="flex justify-between text-green-600"><span>İndirim</span><span>-{couponDiscount?.toLocaleString('tr-TR')} ₺</span></div>}
                   <div className="flex justify-between font-bold text-lg pt-2 border-t"><span>Toplam</span><span>{total?.toLocaleString('tr-TR')} ₺</span></div>
                 </div>
-                <button type="submit" className="mt-6 w-full py-3 bg-brand-500 text-white font-bold rounded-2xl hover:bg-brand-600">Siparişi Tamamla</button>
+                <button type="submit" className="mt-6 w-full py-3 btn-theme font-bold rounded-2xl">Siparişi Tamamla</button>
               </div>
             </div>
           </Form>
         )}
       </Formik>
-    </div>
+      </div>
+    </>
   );
 }
 

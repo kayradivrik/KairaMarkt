@@ -7,9 +7,10 @@ import { Link } from 'react-router-dom';
 export default function AboutPage() {
   return (
     <div className="container mx-auto px-4 py-12 max-w-3xl">
-      <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-6">
+      <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
         Hakkımızda
       </h1>
+      <div className="h-1 w-16 rounded-full bg-theme mb-6" aria-hidden />
 
       <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
         Merhaba! 12. Sınıf bir Meslek Lisesi bilişim bölümünde öğrenciyim Web
@@ -34,7 +35,7 @@ export default function AboutPage() {
         Sorularınız veya önerileriniz için{" "}
         <Link
           to="/iletisim"
-          className="text-red-600 dark:text-red-400 hover:underline"
+          className="text-theme hover:underline"
         >
           İletişim
         </Link>{" "}
@@ -51,7 +52,7 @@ export default function AboutPage() {
           Kullandığım Teknolojiler
         </h2>
 
-        <ul className="list-disc list-inside text-gray-600 dark:text-gray-400 space-y-1">
+        <ul className="list-disc list-inside text-gray-600 dark:text-gray-400 space-y-1 [--tw-list-disc:var(--site-primary)]" style={{ listStyleColor: 'var(--site-primary)' }}>
           <li>React</li>
           <li>Vite</li>
           <li>React Router</li>

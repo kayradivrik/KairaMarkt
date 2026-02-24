@@ -44,7 +44,7 @@ export default function ReturnPage() {
         <section className="p-4 rounded-xl bg-gray-100 dark:bg-gray-800">
           <p className="text-sm text-gray-600 dark:text-gray-400">
             Sorularınız için{' '}
-            <Link to="/iletisim" className="text-red-600 dark:text-red-400 font-medium hover:underline">
+            <Link to="/iletisim" className="text-theme font-medium hover:underline">
               İletişim
             </Link>{' '}
             sayfamızdan bize ulaşabilirsiniz.

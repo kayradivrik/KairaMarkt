@@ -21,12 +21,12 @@ export default function CartPage() {
     return (
       <div className="container mx-auto px-4 py-16">
         <div className="max-w-lg mx-auto text-center">
-          <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-red-50 dark:bg-red-900/20 text-red-500 mb-6">
+          <div className="inline-flex items-center justify-center w-20 h-20 rounded-full mb-6 bg-theme-subtle text-theme">
             <FiShoppingBag className="w-10 h-10" />
           </div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Sepetiniz boş</h1>
           <p className="text-gray-600 dark:text-gray-400 mb-6">Alışverişe başlayarak favori ürünlerinizi sepete ekleyebilirsiniz.</p>
-          <Link to="/urunler" className="inline-flex items-center gap-2 px-6 py-3 bg-red-600 text-white font-semibold rounded-2xl hover:bg-red-700 transition-ux">
+          <Link to="/urunler" className="inline-flex items-center gap-2 px-6 py-3 btn-theme font-semibold rounded-2xl transition-ux">
             Alışverişe Başla
           </Link>
         </div>
@@ -59,13 +59,13 @@ export default function CartPage() {
                   {p?.images?.[0] ? <img src={p.images[0]} alt={p.name} className="w-full h-full object-contain" /> : <div className="w-full h-full" />}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <Link to={`/urun/${p?.slug || p?._id}`} className="font-medium text-gray-900 dark:text-white hover:text-brand-600 line-clamp-2">{p?.name}</Link>
-                  <p className="text-brand-600 font-bold mt-1">{price?.toLocaleString('tr-TR')} ₺</p>
+                  <Link to={`/urun/${p?.slug || p?._id}`} className="font-medium text-gray-900 dark:text-white hover:text-theme line-clamp-2">{p?.name}</Link>
+                  <p className="text-theme font-bold mt-1">{price?.toLocaleString('tr-TR')} ₺</p>
                   <div className="flex items-center gap-2 mt-2">
                     <button type="button" onClick={() => updateQuantity(p._id, item.quantity - 1)} className="w-8 h-8 rounded border border-gray-300 dark:border-gray-600">−</button>
                     <span className="w-8 text-center">{item.quantity}</span>
                     <button type="button" onClick={() => updateQuantity(p._id, item.quantity + 1)} className="w-8 h-8 rounded border border-gray-300 dark:border-gray-600">+</button>
-                    <button type="button" onClick={() => removeItem(p._id)} className="ml-2 p-1 text-brand-600 hover:bg-brand-50 dark:hover:bg-gray-700 rounded">
+                    <button type="button" onClick={() => removeItem(p._id)} className="ml-2 p-1 text-theme hover:bg-gray-100 dark:hover:bg-gray-700 rounded">
                       <FiTrash2 className="w-5 h-5" />
                     </button>
                   </div>
@@ -85,7 +85,7 @@ export default function CartPage() {
             <div className="flex justify-between font-bold text-lg mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
               <span>Toplam</span><span>{total?.toLocaleString('tr-TR')} ₺</span>
             </div>
-            <Link to="/odeme" className="mt-6 block w-full py-3 bg-brand-500 text-white text-center font-bold rounded-2xl hover:bg-brand-600">Ödemeye Geç</Link>
+            <Link to="/odeme" className="mt-6 block w-full py-3 btn-theme text-center font-bold rounded-2xl">Ödemeye Geç</Link>
           </div>
         </div>
       </div>

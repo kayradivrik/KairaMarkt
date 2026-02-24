@@ -6,6 +6,7 @@ import Campaign from '../models/Campaign.js';
 import AdminLog from '../models/AdminLog.js';
 import Slider from '../models/Slider.js';
 import Faq from '../models/Faq.js';
+import SiteSettings from '../models/SiteSettings.js';
 
 const logAction = (adminId, action, target, details = {}, ip = '') => {
   return AdminLog.create({ admin: adminId, action, target, details, ip });
@@ -86,10 +87,22 @@ export const getAdminProducts = async (req, res, next) => {
   }
 };
 
+function parseTechnicalSpecs(specs) {
+  if (Array.isArray(specs)) return specs.filter((s) => s && (s.name != null || s.value != null));
+  if (typeof specs === 'string') {
+    try {
+      const arr = JSON.parse(specs);
+      return Array.isArray(arr) ? arr.filter((s) => s && (s.name != null || s.value != null)) : [];
+    } catch { return []; }
+  }
+  return [];
+}
+
 export const createProduct = async (req, res, next) => {
   try {
     const images = req.files?.filter((f) => f.path).map((f) => f.path) || [];
     const body = req.body || {};
+    const technicalSpecs = parseTechnicalSpecs(body.technicalSpecs);
     const product = await Product.create({
       name: body.name,
       description: body.description ?? '',
@@ -102,6 +115,7 @@ export const createProduct = async (req, res, next) => {
       featured: body.featured === 'true' || body.featured === true,
       isActive: body.isActive !== 'false' && body.isActive !== false,
       images,
+      technicalSpecs,
     });
     await logAction(req.user._id, 'CREATE_PRODUCT', product.name, { id: product._id }, req.ip);
     res.status(201).json({ success: true, product });
@@ -293,6 +307,54 @@ export const deleteSlider = async (req, res, next) => {
     if (!slide) return res.status(404).json({ success: false, message: 'Slider bulunamadı' });
     await logAction(req.user._id, 'DELETE_SLIDER', slide._id.toString(), {}, req.ip);
     res.json({ success: true });
+  } catch (err) {
+    next(err);
+  }
+};
+
+const SETTINGS_DEFAULTS = {
+  siteName: 'KairaMarkt',
+  logoUrl: '',
+  showLogo: false,
+  primaryColor: '#b91c1c',
+  marqueeText: 'KairaMarkt Admin Paneli · Hoş geldiniz · Sipariş ve ürün yönetimini buradan takip edebilirsiniz',
+  footerText: '',
+};
+
+export const getSettings = async (_req, res, next) => {
+  try {
+    const doc = await SiteSettings.findOne().lean();
+    res.json({ success: true, settings: doc ? { ...SETTINGS_DEFAULTS, ...doc } : SETTINGS_DEFAULTS });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const updateSettings = async (req, res, next) => {
+  try {
+    const body = req.body || {};
+    const update = {};
+    if (body.siteName != null) update.siteName = String(body.siteName).trim() || SETTINGS_DEFAULTS.siteName;
+    if (body.logoUrl != null) update.logoUrl = String(body.logoUrl).trim();
+    if (body.showLogo != null) update.showLogo = !!body.showLogo;
+    if (body.primaryColor != null) update.primaryColor = String(body.primaryColor).trim() || SETTINGS_DEFAULTS.primaryColor;
+    if (body.marqueeText != null) update.marqueeText = String(body.marqueeText).trim();
+    if (body.footerText != null) update.footerText = String(body.footerText).trim();
+    const doc = await SiteSettings.findOneAndUpdate({}, { $set: update }, { new: true, upsert: true }).lean();
+    await logAction(req.user._id, 'UPDATE_SETTINGS', 'site', update, req.ip);
+    res.json({ success: true, settings: { ...SETTINGS_DEFAULTS, ...doc } });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const uploadLogo = async (req, res, next) => {
+  try {
+    const url = req.file?.path || req.file?.url || '';
+    if (!url) return res.status(400).json({ success: false, message: 'Logo dosyası gerekli' });
+    await SiteSettings.findOneAndUpdate({}, { $set: { logoUrl: url, showLogo: true } }, { new: true, upsert: true });
+    await logAction(req.user._id, 'UPLOAD_LOGO', 'site', {}, req.ip);
+    res.json({ success: true, logoUrl: url });
   } catch (err) {
     next(err);
   }
