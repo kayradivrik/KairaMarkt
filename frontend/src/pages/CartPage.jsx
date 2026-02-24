@@ -60,6 +60,9 @@ export default function CartPage() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <Link to={`/urun/${p?.slug || p?._id}`} className="font-medium text-gray-900 dark:text-white hover:text-theme line-clamp-2">{p?.name}</Link>
+                  {item.cardMessage ? (
+                    <p className="mt-1 text-sm text-gray-600 dark:text-gray-400 italic border-l-2 border-theme pl-2">Kart notu: {item.cardMessage}</p>
+                  ) : null}
                   <p className="text-theme font-bold mt-1">{price?.toLocaleString('tr-TR')} ₺</p>
                   <div className="flex items-center gap-2 mt-2">
                     <button type="button" onClick={() => updateQuantity(p._id, item.quantity - 1)} className="w-8 h-8 rounded border border-gray-300 dark:border-gray-600">−</button>
@@ -86,6 +89,7 @@ export default function CartPage() {
               <span>Toplam</span><span>{total?.toLocaleString('tr-TR')} ₺</span>
             </div>
             <Link to="/odeme" className="mt-6 block w-full py-3 btn-theme text-center font-bold rounded-2xl">Ödemeye Geç</Link>
+            <p className="mt-3 text-center text-xs text-gray-500 dark:text-gray-400">Güvenli ödeme · SSL ile korunmaktadır</p>
           </div>
         </div>
       </div>

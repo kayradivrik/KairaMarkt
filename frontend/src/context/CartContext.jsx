@@ -23,16 +23,20 @@ function cartReducer(state, action) {
     case 'SET':
       next = action.payload;
       break;
-    case 'ADD':
-      const existing = state.find((i) => i.product?._id === action.payload.product?._id);
+    case 'ADD': {
+      const payload = action.payload;
+      const existing = state.find((i) => i.product?._id === payload.product?._id && (i.cardMessage ?? '') === (payload.cardMessage ?? ''));
       if (existing) {
         next = state.map((i) =>
-          i.product?._id === action.payload.product?._id ? { ...i, quantity: i.quantity + (action.payload.quantity || 1) } : i
+          i.product?._id === payload.product?._id && (i.cardMessage ?? '') === (payload.cardMessage ?? '')
+            ? { ...i, quantity: i.quantity + (payload.quantity || 1) }
+            : i
         );
       } else {
-        next = [...state, { ...action.payload, quantity: action.payload.quantity || 1 }];
+        next = [...state, { ...payload, quantity: payload.quantity || 1 }];
       }
       break;
+    }
     case 'REMOVE':
       next = state.filter((i) => i.product?._id !== action.payload);
       break;
@@ -58,7 +62,8 @@ export function CartProvider({ children }) {
     saveCart(items);
   }, [items]);
 
-  const addItem = (product, quantity = 1) => dispatch({ type: 'ADD', payload: { product, quantity } });
+  const addItem = (product, quantity = 1, options = {}) =>
+    dispatch({ type: 'ADD', payload: { product, quantity, cardMessage: options.cardMessage ?? '' } });
   const removeItem = (productId) => dispatch({ type: 'REMOVE', payload: productId });
   const updateQuantity = (id, quantity) => dispatch({ type: 'UPDATE_QTY', payload: { id, quantity } });
   const clearCart = () => dispatch({ type: 'CLEAR' });

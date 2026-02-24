@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
 import toast from 'react-hot-toast';
@@ -17,15 +17,89 @@ const passwordSchema = Yup.object({
   newPasswordConfirm: Yup.string().oneOf([Yup.ref('newPassword')], 'Şifreler eşleşmiyor').required(),
 });
 
+const AVATAR_SIZE = 256;
+const MAX_AVATAR_BYTES = 150000;
+
+function resizeImageToDataUrl(file) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      const canvas = document.createElement('canvas');
+      const scale = Math.min(AVATAR_SIZE / img.width, AVATAR_SIZE / img.height, 1);
+      canvas.width = Math.round(img.width * scale);
+      canvas.height = Math.round(img.height * scale);
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      let dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+      if (dataUrl.length > MAX_AVATAR_BYTES) dataUrl = canvas.toDataURL('image/jpeg', 0.6);
+      resolve(dataUrl);
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Resim yüklenemedi')); };
+    img.src = url;
+  });
+}
+
 function ProfileContent() {
   const { user, setUser } = useAuth();
   const [pwSuccess, setPwSuccess] = useState(false);
+  const [avatarLoading, setAvatarLoading] = useState(false);
+  const fileInputRef = useRef(null);
 
   if (!user) return null;
+
+  const handleAvatarChange = async (e) => {
+    const file = e.target?.files?.[0];
+    if (!file || !file.type.startsWith('image/')) {
+      toast.error('Lütfen bir resim dosyası seçin');
+      return;
+    }
+    setAvatarLoading(true);
+    try {
+      const dataUrl = await resizeImageToDataUrl(file);
+      const { data } = await updateProfile({ avatar: dataUrl });
+      setUser(data.user);
+      toast.success('Profil fotoğrafı güncellendi');
+    } catch (err) {
+      toast.error(err.message || 'Yüklenemedi');
+    } finally {
+      setAvatarLoading(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-2xl">
       <h1 className="text-2xl font-bold mb-6">Profil</h1>
+
+      <div className="mb-8 p-4 rounded-2xl border border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/50">
+        <h2 className="text-sm font-semibold text-gray-600 dark:text-gray-400 mb-3">Profil fotoğrafı</h2>
+        <div className="flex items-center gap-4">
+          <div className="relative flex-shrink-0">
+            <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-gray-300 dark:border-gray-600 bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+              {user.avatar ? (
+                <img src={user.avatar} alt="Profil" className="w-full h-full object-cover" />
+              ) : (
+                <span className="text-3xl text-gray-400">?</span>
+              )}
+            </div>
+            {avatarLoading && (
+              <div className="absolute inset-0 rounded-full bg-black/50 flex items-center justify-center">
+                <span className="text-white text-xs">Yükleniyor...</span>
+              </div>
+            )}
+          </div>
+          <div>
+            <input ref={fileInputRef} type="file" accept="image/*" onChange={handleAvatarChange} className="hidden" />
+            <button type="button" onClick={() => fileInputRef.current?.click()} disabled={avatarLoading} className="px-4 py-2 btn-theme rounded-xl text-sm font-semibold disabled:opacity-50">
+              Fotoğraf seç / değiştir
+            </button>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">JPG, PNG. Navbarda yuvarlak içinde görünür.</p>
+          </div>
+        </div>
+      </div>
+
       <Formik
         initialValues={{ name: user.name || '', phone: user.phone || '', address: user.address || {} }}
         validationSchema={profileSchema}

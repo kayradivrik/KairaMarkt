@@ -180,7 +180,13 @@ export default function Navbar() {
             {user ? (
               <div className="relative group hidden md:block">
                 <button className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
-                  <FiUser className="w-6 h-6" />
+                  <span className="w-9 h-9 rounded-full overflow-hidden border-2 border-gray-200 dark:border-gray-600 bg-gray-200 dark:bg-gray-700 flex-shrink-0 flex items-center justify-center">
+                    {user.avatar ? (
+                      <img src={user.avatar} alt="" className="w-full h-full object-cover" />
+                    ) : (
+                      <FiUser className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+                    )}
+                  </span>
                   <span className="text-sm">{user.name}</span>
                 </button>
                 <div className="absolute right-0 mt-1 w-48 py-1 bg-white dark:bg-gray-800 rounded-lg shadow-card-hover border border-gray-200 dark:border-gray-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-ux duration-150">
@@ -335,7 +341,10 @@ export default function Navbar() {
                     <>
                       <li>
                         <Link to="/profil" onClick={closeMenu(setOpen)} className="flex items-center gap-3 px-4 py-3.5 rounded-xl text-gray-800 dark:text-gray-200 font-medium active:bg-gray-100 dark:active:bg-gray-800 transition-colors">
-                          <FiUser className="w-5 h-5 text-gray-400 shrink-0" /> {user.name}
+                          <span className="w-9 h-9 rounded-full overflow-hidden border border-gray-300 dark:border-gray-600 bg-gray-200 dark:bg-gray-700 flex-shrink-0 flex items-center justify-center">
+                            {user.avatar ? <img src={user.avatar} alt="" className="w-full h-full object-cover" /> : <FiUser className="w-5 h-5 text-gray-400" />}
+                          </span>
+                          {user.name}
                         </Link>
                       </li>
                       <li>

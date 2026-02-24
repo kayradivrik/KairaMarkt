@@ -25,6 +25,9 @@ import FaqPage from './pages/FaqPage';
 import CampaignsPage from './pages/CampaignsPage';
 import ReturnPage from './pages/ReturnPage';
 import ForumPage from './pages/ForumPage';
+import GizlilikPage from './pages/GizlilikPage';
+import KvkkPage from './pages/KvkkPage';
+import KullanimKosullariPage from './pages/KullanimKosullariPage';
 import NotFoundPage from './pages/NotFoundPage';
 import Error500Page from './pages/Error500Page';
 import AdminDashboard from './pages/admin/AdminDashboard';
@@ -60,6 +63,9 @@ export default function App() {
           <Route path="sss" element={<FaqPage />} />
           <Route path="kampanyalar" element={<CampaignsPage />} />
           <Route path="iade" element={<ReturnPage />} />
+          <Route path="gizlilik" element={<GizlilikPage />} />
+          <Route path="kvkk" element={<KvkkPage />} />
+          <Route path="kullanim-kosullari" element={<KullanimKosullariPage />} />
           <Route path="forum" element={<ForumPage />} />
           <Route path="forum/konu/:slug" element={<ForumPage />} />
           <Route path="500" element={<Error500Page />} />

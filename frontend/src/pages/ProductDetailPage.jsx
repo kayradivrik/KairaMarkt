@@ -173,6 +173,7 @@ export default function ProductDetailPage() {
               </table>
             </div>
           )}
+
           <button type="button" onClick={handleAddCart} disabled={stockNum === 0} className="mt-6 w-full md:w-auto px-8 py-3 btn-theme font-bold rounded-2xl disabled:opacity-50 disabled:cursor-not-allowed transition-ux">
             Sepete Ekle
           </button>
