@@ -42,10 +42,10 @@ export default function AdminProducts() {
     <div>
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Ürünler</h1>
-        <Link to="/admin/urunler/yeni" className="px-4 py-2 bg-brand-500 text-white rounded-2xl hover:bg-brand-600 text-sm font-semibold">Yeni Ürün</Link>
+        <Link to="/admin/urunler/yeni" className="px-4 py-2 btn-theme rounded-2xl text-sm font-semibold">Yeni Ürün</Link>
       </div>
       {loading ? (
-        <div className="flex justify-center py-12"><div className="w-10 h-10 border-2 border-brand-500 border-t-transparent rounded-full animate-spin" /></div>
+        <div className="flex justify-center py-12"><div className="w-10 h-10 border-2 border-theme border-t-transparent rounded-full animate-spin" /></div>
       ) : (
         <>
           <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
@@ -75,8 +75,8 @@ export default function AdminProducts() {
                     </td>
                     <td className="p-3">{p.isActive ? 'Aktif' : 'Pasif'}</td>
                     <td className="p-3 text-right">
-                      <Link to={`/admin/urunler/${p._id}`} className="text-brand-600 mr-2">Düzenle</Link>
-                      <button type="button" onClick={() => handleDelete(p._id, p.name)} className="text-brand-600">Sil</button>
+                      <Link to={`/admin/urunler/${p._id}`} className="text-theme mr-2">Düzenle</Link>
+                      <button type="button" onClick={() => handleDelete(p._id, p.name)} className="text-theme">Sil</button>
                     </td>
                   </tr>
                 ))}

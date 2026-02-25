@@ -12,20 +12,37 @@ const logAction = (adminId, action, target, details = {}, ip = '') => {
   return AdminLog.create({ admin: adminId, action, target, details, ip });
 };
 
+const LOW_STOCK_THRESHOLD = 5;
+
 export const getDashboard = async (_req, res, next) => {
   try {
-    const [userCount, productCount, orderCount, totalRevenue] = await Promise.all([
+    const [userCount, productCount, orderCount, totalRevenue, lowStockCount, pendingOrdersCount] = await Promise.all([
       User.countDocuments(),
       Product.countDocuments(),
       Order.countDocuments(),
       Order.aggregate([{ $match: { status: { $ne: 'cancelled' } } }, { $group: { _id: null, sum: { $sum: '$total' } } }]),
+      Product.countDocuments({ stock: { $lte: LOW_STOCK_THRESHOLD }, isActive: true }),
+      Order.countDocuments({ status: 'pending' }),
     ]);
     const revenue = totalRevenue[0]?.sum ?? 0;
-    const lastOrders = await Order.find().sort({ createdAt: -1 }).limit(10).populate('user', 'name email').lean();
+    const [lastOrders, lastReviews, lowStockProducts] = await Promise.all([
+      Order.find().sort({ createdAt: -1 }).limit(10).populate('user', 'name email').lean(),
+      Review.find().populate('user', 'name').populate('product', 'name').sort({ createdAt: -1 }).limit(5).lean(),
+      Product.find({ stock: { $lte: LOW_STOCK_THRESHOLD }, isActive: true }).select('name stock').sort({ stock: 1 }).limit(10).lean(),
+    ]);
     res.json({
       success: true,
-      stats: { userCount, productCount, orderCount, totalRevenue: revenue },
+      stats: {
+        userCount,
+        productCount,
+        orderCount,
+        totalRevenue: revenue,
+        lowStockCount,
+        pendingOrdersCount,
+      },
       lastOrders,
+      lastReviews,
+      lowStockProducts,
     });
   } catch (err) {
     next(err);
@@ -164,9 +181,11 @@ export const getAdminOrders = async (req, res, next) => {
   try {
     const page = Math.max(1, parseInt(req.query.page) || 1);
     const limit = Math.min(50, Math.max(1, parseInt(req.query.limit) || 10));
+    const status = req.query.status?.trim();
+    const filter = status ? { status } : {};
     const [orders, total] = await Promise.all([
-      Order.find().sort({ createdAt: -1 }).populate('user', 'name email').skip((page - 1) * limit).limit(limit).lean(),
-      Order.countDocuments(),
+      Order.find(filter).sort({ createdAt: -1 }).populate('user', 'name email').skip((page - 1) * limit).limit(limit).lean(),
+      Order.countDocuments(filter),
     ]);
     res.json({ success: true, orders, total, page, limit });
   } catch (err) {
@@ -317,8 +336,36 @@ const SETTINGS_DEFAULTS = {
   logoUrl: '',
   showLogo: false,
   primaryColor: '#b91c1c',
-  marqueeText: 'KairaMarkt Admin Paneli · Hoş geldiniz · Sipariş ve ürün yönetimini buradan takip edebilirsiniz',
+  marqueeText: '',
   footerText: '',
+  footerBgColor: '',
+  footerTextColor: '',
+  contactEmail: '',
+  contactPhone: '',
+  address: '',
+  workingHours: '',
+  metaDescription: '',
+  facebookUrl: '',
+  twitterUrl: '',
+  instagramUrl: '',
+  showSocialLinks: true,
+  footerSectionKurumsal: '',
+  footerSectionYardim: '',
+  footerSectionYasal: '',
+  footerLabelAbout: '',
+  footerLabelContact: '',
+  footerLabelCampaigns: '',
+  footerLabelSss: '',
+  footerLabelIade: '',
+  footerLabelTeslimat: '',
+  footerLabelGizlilik: '',
+  footerLabelKvkk: '',
+  footerLabelKosullar: '',
+  footerBadge1: '',
+  footerBadge2: '',
+  footerBadge3: '',
+  footerBadge4: '',
+  footerBottomText: '',
 };
 
 export const getSettings = async (_req, res, next) => {
@@ -340,6 +387,34 @@ export const updateSettings = async (req, res, next) => {
     if (body.primaryColor != null) update.primaryColor = String(body.primaryColor).trim() || SETTINGS_DEFAULTS.primaryColor;
     if (body.marqueeText != null) update.marqueeText = String(body.marqueeText).trim();
     if (body.footerText != null) update.footerText = String(body.footerText).trim();
+    if (body.footerBgColor != null) update.footerBgColor = String(body.footerBgColor).trim();
+    if (body.footerTextColor != null) update.footerTextColor = String(body.footerTextColor).trim();
+    if (body.contactEmail != null) update.contactEmail = String(body.contactEmail).trim();
+    if (body.contactPhone != null) update.contactPhone = String(body.contactPhone).trim();
+    if (body.address != null) update.address = String(body.address).trim();
+    if (body.workingHours != null) update.workingHours = String(body.workingHours).trim();
+    if (body.metaDescription != null) update.metaDescription = String(body.metaDescription).trim();
+    if (body.facebookUrl != null) update.facebookUrl = String(body.facebookUrl).trim();
+    if (body.twitterUrl != null) update.twitterUrl = String(body.twitterUrl).trim();
+    if (body.instagramUrl != null) update.instagramUrl = String(body.instagramUrl).trim();
+    if (body.showSocialLinks != null) update.showSocialLinks = !!body.showSocialLinks;
+    if (body.footerSectionKurumsal != null) update.footerSectionKurumsal = String(body.footerSectionKurumsal).trim();
+    if (body.footerSectionYardim != null) update.footerSectionYardim = String(body.footerSectionYardim).trim();
+    if (body.footerSectionYasal != null) update.footerSectionYasal = String(body.footerSectionYasal).trim();
+    if (body.footerLabelAbout != null) update.footerLabelAbout = String(body.footerLabelAbout).trim();
+    if (body.footerLabelContact != null) update.footerLabelContact = String(body.footerLabelContact).trim();
+    if (body.footerLabelCampaigns != null) update.footerLabelCampaigns = String(body.footerLabelCampaigns).trim();
+    if (body.footerLabelSss != null) update.footerLabelSss = String(body.footerLabelSss).trim();
+    if (body.footerLabelIade != null) update.footerLabelIade = String(body.footerLabelIade).trim();
+    if (body.footerLabelTeslimat != null) update.footerLabelTeslimat = String(body.footerLabelTeslimat).trim();
+    if (body.footerLabelGizlilik != null) update.footerLabelGizlilik = String(body.footerLabelGizlilik).trim();
+    if (body.footerLabelKvkk != null) update.footerLabelKvkk = String(body.footerLabelKvkk).trim();
+    if (body.footerLabelKosullar != null) update.footerLabelKosullar = String(body.footerLabelKosullar).trim();
+    if (body.footerBadge1 != null) update.footerBadge1 = String(body.footerBadge1).trim();
+    if (body.footerBadge2 != null) update.footerBadge2 = String(body.footerBadge2).trim();
+    if (body.footerBadge3 != null) update.footerBadge3 = String(body.footerBadge3).trim();
+    if (body.footerBadge4 != null) update.footerBadge4 = String(body.footerBadge4).trim();
+    if (body.footerBottomText != null) update.footerBottomText = String(body.footerBottomText).trim();
     const doc = await SiteSettings.findOneAndUpdate({}, { $set: update }, { new: true, upsert: true }).lean();
     await logAction(req.user._id, 'UPDATE_SETTINGS', 'site', update, req.ip);
     res.json({ success: true, settings: { ...SETTINGS_DEFAULTS, ...doc } });

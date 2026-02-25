@@ -1,8 +1,3 @@
-/**
- * Üst menü - logo, arama, sepet, tema, kullanıcı
- * Mobil: sağdan açılan drawer, gruplu linkler, scroll kilidi
- * KairaMarkt - Kayra tarafından yapılmıştır
- */
 import { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { Link, useNavigate } from 'react-router-dom';
@@ -223,7 +218,6 @@ export default function Navbar() {
           </div>
         </div>
 
-        {/* Mobil: overlay + drawer portal ile body'e, böylece üstte ve tıklanabilir kalır */}
         {typeof document !== 'undefined' &&
           createPortal(
             <div className="md:hidden">

@@ -1,6 +1,11 @@
 import 'dotenv/config';
+import path from 'path';
+import fs from 'fs';
+import { fileURLToPath } from 'url';
 import express from 'express';
 import cors from 'cors';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import mongoSanitize from 'express-mongo-sanitize';
@@ -78,6 +83,18 @@ app.use('/api/forum', forumRoutes);
 app.use('/api/settings', settingsRoutes);
 
 app.get('/api/health', (_, res) => res.json({ ok: true }));
+
+// SPA fallback: frontend build varsa statik dosyaları sun, tüm GET isteklerinde (API hariç) index.html dön → F5 /sepet vb. çalışır
+const clientBuild = path.resolve(process.env.CLIENT_BUILD_PATH || path.join(__dirname, '..', '..', 'frontend', 'dist'));
+if (fs.existsSync(clientBuild)) {
+  app.use(express.static(clientBuild));
+  app.get('*', (req, res, next) => {
+    if (req.path.startsWith('/api')) return next();
+    res.sendFile(path.join(clientBuild, 'index.html'), (err) => {
+      if (err) next();
+    });
+  });
+}
 
 app.use(errorHandler);
 

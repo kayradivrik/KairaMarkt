@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Outlet, Link, useLocation } from 'react-router-dom';
+import { Outlet } from 'react-router-dom';
 import { FiGrid, FiImage, FiPackage, FiUsers, FiShoppingBag, FiMessageSquare, FiTag, FiFileText, FiSettings, FiExternalLink, FiMenu, FiX } from 'react-icons/fi';
 import { useSettings } from '../context/SettingsContext';
 import ProtectedRoute from '../components/ProtectedRoute';
@@ -22,7 +22,7 @@ const getPageTitle = (path) => {
 };
 
 function AdminSidebar({ onClose, isOpen }) {
-  const location = useLocation();
+  const pathname = typeof window !== 'undefined' ? window.location.pathname : '';
   const { primaryColor, siteName } = useSettings();
   const accent = primaryColor || '#b91c1c';
   const linkClass = (isActive) =>
@@ -42,15 +42,15 @@ function AdminSidebar({ onClose, isOpen }) {
       `}
     >
       <div className="flex items-center justify-between p-4 md:p-5 border-b border-gray-200 dark:border-gray-800 shrink-0">
-        <Link
-          to="/"
+        <a
+          href="/"
           className="flex items-center gap-2 font-bold text-lg text-gray-900 dark:text-white hover:opacity-90 transition-opacity"
           style={{ color: accent }}
           onClick={onClose}
         >
           {siteName || 'KairaMarkt'}
           <FiExternalLink className="w-4 h-4 opacity-70" />
-        </Link>
+        </a>
         <button
           type="button"
           onClick={onClose}
@@ -63,18 +63,18 @@ function AdminSidebar({ onClose, isOpen }) {
       <span className="block text-xs text-gray-500 dark:text-gray-400 px-5 pb-2 md:pb-0">Admin Paneli</span>
       <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
         {links.map(({ to, icon: Icon, label }) => {
-          const isActive = location.pathname === to;
+          const isActive = pathname === to;
           return (
-            <Link
+            <a
               key={to}
-              to={to}
+              href={to}
               className={linkClass(isActive)}
               style={isActive ? { backgroundColor: accent } : {}}
               onClick={onClose}
             >
               <Icon className="w-5 h-5 shrink-0" />
               {label}
-            </Link>
+            </a>
           );
         })}
       </nav>
@@ -84,23 +84,20 @@ function AdminSidebar({ onClose, isOpen }) {
 
 export default function AdminLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const location = useLocation();
-  const pageTitle = getPageTitle(location.pathname);
+  const pathname = typeof window !== 'undefined' ? window.location.pathname : '';
+  const pageTitle = getPageTitle(pathname);
 
   return (
     <ProtectedRoute adminOnly>
       <div className="flex min-h-screen bg-gray-50 dark:bg-gray-950">
-        {/* Mobil: overlay */}
         <div
           role="presentation"
           className={`fixed inset-0 bg-black/50 z-30 transition-opacity md:hidden ${sidebarOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
           onClick={() => setSidebarOpen(false)}
           aria-hidden="true"
         />
-        {/* Sidebar: mobilde drawer, masaüstünde normal */}
         <AdminSidebar onClose={() => setSidebarOpen(false)} isOpen={sidebarOpen} />
         <div className="flex-1 flex flex-col min-w-0">
-          {/* Mobil: üst bar menü butonu + başlık */}
           <header className="md:hidden sticky top-0 z-20 flex items-center gap-3 px-4 py-3 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 shadow-soft">
             <button
               type="button"

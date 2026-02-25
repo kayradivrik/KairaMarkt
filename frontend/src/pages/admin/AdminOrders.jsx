@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { getAdminOrders, updateOrderStatus } from '../../services/adminService';
 
@@ -6,6 +7,8 @@ const STATUS_OPTIONS = ['pending', 'processing', 'shipped', 'delivered', 'cancel
 const STATUS_LABEL = { pending: 'Beklemede', processing: 'Hazırlanıyor', shipped: 'Kargoda', delivered: 'Teslim edildi', cancelled: 'İptal' };
 
 export default function AdminOrders() {
+  const [searchParams] = useSearchParams();
+  const statusFilter = searchParams.get('status') || '';
   const [orders, setOrders] = useState([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
@@ -13,7 +16,7 @@ export default function AdminOrders() {
 
   const load = () => {
     setLoading(true);
-    getAdminOrders(page, 10)
+    getAdminOrders(page, 10, statusFilter)
       .then((r) => {
         setOrders(r.data.orders || []);
         setTotal(r.data.total || 0);
@@ -22,7 +25,7 @@ export default function AdminOrders() {
       .finally(() => setLoading(false));
   };
 
-  useEffect(load, [page]);
+  useEffect(load, [page, statusFilter]);
 
   const handleStatusChange = (orderId, status) => {
     updateOrderStatus(orderId, status)
@@ -34,9 +37,16 @@ export default function AdminOrders() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-6">Siparişler</h1>
+      <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+        <h1 className="text-2xl font-bold">Siparişler</h1>
+        {statusFilter && (
+          <span className="text-sm text-amber-700 dark:text-amber-300 bg-amber-100 dark:bg-amber-900/30 px-3 py-1 rounded-lg">
+            Filtre: {STATUS_LABEL[statusFilter] || statusFilter}
+          </span>
+        )}
+      </div>
       {loading ? (
-        <div className="flex justify-center py-12"><div className="w-10 h-10 border-2 border-brand-500 border-t-transparent rounded-full animate-spin" /></div>
+        <div className="flex justify-center py-12"><div className="w-10 h-10 border-2 border-theme border-t-transparent rounded-full animate-spin" /></div>
       ) : (
         <>
           <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-x-auto">

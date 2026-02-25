@@ -1,7 +1,3 @@
-/**
- * Teslimat & Sipariş Durumları sayfası
- * KairaMarkt - Kayra tarafından yapılmıştır
- */
 export default function TeslimatPage() {
   const statuses = [
     { code: 'pending', label: 'Beklemede', desc: 'Siparişiniz alındı ve ödeme onayı bekleniyor.' },

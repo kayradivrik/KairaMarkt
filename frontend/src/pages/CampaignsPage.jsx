@@ -1,13 +1,15 @@
-/**
- * Kampanyalar - Aktif kuponlar listesi
- * KairaMarkt - Kayra tarafından yapılmıştır
- */
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import { getActiveCampaigns } from '../services/campaignService';
-import { FiTag } from 'react-icons/fi';
+import { FiTag, FiChevronRight, FiCopy } from 'react-icons/fi';
+import Breadcrumb from '../components/Breadcrumb';
+import LoadingSpinner from '../components/LoadingSpinner';
+import { useSettings } from '../context/SettingsContext';
 
 export default function CampaignsPage() {
+  const { primaryColor } = useSettings();
+  const accent = primaryColor || '#b91c1c';
   const [campaigns, setCampaigns] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -18,84 +20,132 @@ export default function CampaignsPage() {
       .finally(() => setLoading(false));
   }, []);
 
-  const formatDate = (d) => (d ? new Date(d).toLocaleDateString('tr-TR') : '-');
+  const formatDate = (d) => (d ? new Date(d).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' }) : '-');
+
   const discountText = (c) =>
     c.discountType === 'percent'
       ? `%${c.discountValue} indirim`
       : `${c.discountValue?.toLocaleString('tr-TR')} ₺ indirim`;
 
+  const copyCode = (code) => {
+    if (typeof navigator !== 'undefined' && navigator.clipboard) {
+      navigator.clipboard.writeText(code).then(() => toast.success('Kupon kodu kopyalandı'));
+    } else {
+      toast.success('Kupon: ' + code);
+    }
+  };
+
   return (
-    <div className="container mx-auto px-4 py-12">
-      <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Kampanyalar</h1>
-      <p className="text-gray-600 dark:text-gray-400 mb-8">
-        Güncel kuponları ödeme sayfasında kullanabilirsiniz. Minimum alışveriş tutarı kampanya kartında belirtilir.
-      </p>
+    <div className="container mx-auto px-4 py-8 max-w-5xl">
+      <Breadcrumb items={[{ label: 'Ana Sayfa', href: '/' }, { label: 'Kampanyalar' }]} />
+
+      <div className="flex items-center gap-4 mb-8">
+        <div className="p-3 rounded-2xl text-white" style={{ backgroundColor: accent }}>
+          <FiTag className="w-8 h-8" aria-hidden />
+        </div>
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">Kampanyalar</h1>
+          <p className="text-gray-500 dark:text-gray-400 mt-0.5">Kuponları ödeme sayfasında kullanın</p>
+        </div>
+      </div>
+
+      <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 sm:p-6 mb-8" style={{ borderLeftWidth: '4px', borderLeftColor: accent }}>
+        <p className="text-sm text-gray-600 dark:text-gray-400">
+          Güncel kuponları aşağıdan kopyalayıp sepetinize ürün ekledikten sonra ödeme sayfasında kupon alanına yapıştırabilirsiniz. Minimum alışveriş tutarı her kampanya kartında belirtilir.
+        </p>
+      </div>
 
       {loading ? (
-        <div className="flex justify-center py-12">
-          <div className="w-10 h-10 border-2 border-red-500 border-t-transparent rounded-full animate-spin" />
+        <div className="flex flex-col items-center justify-center py-16">
+          <LoadingSpinner ariaLabel="Kampanyalar yükleniyor" />
+          <p className="mt-4 text-sm text-gray-500 dark:text-gray-400">Kampanyalar getiriliyor...</p>
         </div>
       ) : campaigns.length === 0 ? (
-        <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-8 text-center">
-          <FiTag className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-          <p className="text-gray-500 dark:text-gray-400">Şu an aktif kampanya bulunmuyor.</p>
-          <Link to="/urunler" className="inline-block mt-4 text-theme font-medium hover:underline">
-            Ürünlere göz at →
+        <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-12 text-center">
+          <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 mb-4">
+            <FiTag className="w-10 h-10" aria-hidden />
+          </div>
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Şu an aktif kampanya yok</h2>
+          <p className="text-gray-500 dark:text-gray-400 mb-6">Yeni kampanyaları kaçırmayın, ara sıra uğrayın.</p>
+          <Link
+            to="/urunler"
+            className="inline-flex items-center gap-2 px-6 py-3 btn-theme font-semibold rounded-2xl"
+          >
+            Ürünlere göz at
+            <FiChevronRight className="w-5 h-5" aria-hidden />
           </Link>
         </div>
       ) : (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {campaigns.map((c) => (
             <div
               key={c._id}
-              className="rounded-xl border-2 border-red-200 dark:border-red-900/50 bg-white dark:bg-gray-800 p-5 hover:shadow-lg transition-ux"
+              className="rounded-2xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 overflow-hidden hover:shadow-lg transition-all duration-200 hover:border-theme/50"
             >
-              <div className="flex items-start justify-between gap-2">
-                <div>
-                  <h3 className="font-bold text-gray-900 dark:text-white">{c.name}</h3>
-                  {c.description && (
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{c.description}</p>
-                  )}
+              <div className="p-5 pb-0">
+                <div className="flex items-start justify-between gap-2">
+                  <h3 className="font-bold text-gray-900 dark:text-white text-lg">{c.name}</h3>
+                  <span
+                    className="px-3 py-1 rounded-xl text-sm font-bold whitespace-nowrap text-white"
+                    style={{ backgroundColor: accent }}
+                  >
+                    {discountText(c)}
+                  </span>
                 </div>
-                <span className="px-2 py-1 rounded bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300 text-sm font-semibold whitespace-nowrap">
-                  {discountText(c)}
-                </span>
+                {c.description && (
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-2 line-clamp-2">{c.description}</p>
+                )}
               </div>
-              <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
-                <p className="text-sm">
-                  <span className="text-gray-500 dark:text-gray-400">Kupon kodu: </span>
-                  <code className="font-mono font-bold text-gray-900 dark:text-white bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded">
+              <div className="p-5 pt-4 space-y-3">
+                <div className="flex items-center gap-2">
+                  <code className="flex-1 font-mono text-sm font-bold text-gray-900 dark:text-white bg-gray-100 dark:bg-gray-700 px-3 py-2 rounded-xl truncate">
                     {c.code}
                   </code>
-                </p>
+                  <button
+                    type="button"
+                    onClick={() => copyCode(c.code)}
+                    className="p-2.5 rounded-xl border border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                    title="Kopyala"
+                    aria-label="Kupon kodunu kopyala"
+                  >
+                    <FiCopy className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                  </button>
+                </div>
                 {c.minPurchase > 0 && (
-                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                    Min. alışveriş: {c.minPurchase.toLocaleString('tr-TR')} ₺
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    Min. alışveriş: <strong className="text-gray-700 dark:text-gray-300">{c.minPurchase.toLocaleString('tr-TR')} ₺</strong>
                   </p>
                 )}
-                <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                <p className="text-xs text-gray-400 dark:text-gray-500">
                   Geçerlilik: {formatDate(c.endDate)}
                 </p>
               </div>
-              <Link
-                to="/sepet"
-                className="mt-4 inline-block text-sm font-medium text-theme hover:underline"
-              >
-                Sepete git ve kullan →
-              </Link>
+              <div className="px-5 pb-5">
+                <Link
+                  to="/sepet"
+                  className="inline-flex items-center gap-2 text-sm font-semibold hover:underline"
+                  style={{ color: accent }}
+                >
+                  Sepete git ve kullan
+                  <FiChevronRight className="w-4 h-4" aria-hidden />
+                </Link>
+              </div>
             </div>
           ))}
         </div>
       )}
 
-      <div className="mt-10 text-center">
-        <Link
-          to="/odeme"
-          className="inline-flex items-center gap-2 px-5 py-2.5 btn-theme font-semibold rounded-xl transition-ux"
-        >
-          Ödeme sayfasında kupon gir
-        </Link>
-      </div>
+      {!loading && campaigns.length > 0 && (
+        <div className="mt-10 text-center">
+          <Link
+            to="/odeme"
+            className="inline-flex items-center gap-2 px-6 py-3 btn-theme font-semibold rounded-2xl"
+          >
+            Ödeme sayfasında kupon gir
+            <FiChevronRight className="w-5 h-5" aria-hidden />
+          </Link>
+        </div>
+      )}
     </div>
   );
 }

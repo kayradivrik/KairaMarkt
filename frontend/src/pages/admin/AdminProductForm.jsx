@@ -20,7 +20,7 @@ export default function AdminProductForm() {
       .finally(() => setLoading(false));
   }, [id, isNew]);
 
-  if (!isNew && loading) return <div className="flex justify-center py-12"><div className="w-10 h-10 border-2 border-brand-500 border-t-transparent rounded-full animate-spin" /></div>;
+  if (!isNew && loading) return <div className="flex justify-center py-12"><div className="w-10 h-10 border-2 border-theme border-t-transparent rounded-full animate-spin" /></div>;
   if (!isNew && !product) return <p>Ürün bulunamadı.</p>;
 
   const initial = product || {
@@ -89,7 +89,7 @@ export default function AdminProductForm() {
                 name="description"
                 rows={6}
                 placeholder="Ürünün özelliklerini, teknik detaylarını ve müşteriye iletmek istediğiniz bilgileri yazın. Satır atlamak için Enter kullanabilirsiniz."
-                className="w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 min-h-[140px] resize-y focus:ring-2 focus:ring-brand-500 focus:border-transparent"
+                className="w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 min-h-[140px] resize-y focus:ring-2 focus:ring-theme focus:border-transparent"
               />
             </div>
             <div className="grid grid-cols-2 gap-4">
@@ -136,7 +136,7 @@ export default function AdminProductForm() {
                   <button type="button" onClick={() => setFieldValue('technicalSpecs', values.technicalSpecs.filter((_, j) => j !== i).length ? values.technicalSpecs.filter((_, j) => j !== i) : [{ name: '', value: '' }])} className="px-2 py-1 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded">Sil</button>
                 </div>
               ))}
-              <button type="button" onClick={() => setFieldValue('technicalSpecs', [...(values.technicalSpecs || []), { name: '', value: '' }])} className="text-sm text-brand-600 dark:text-brand-400 font-medium">+ Özellik ekle</button>
+              <button type="button" onClick={() => setFieldValue('technicalSpecs', [...(values.technicalSpecs || []), { name: '', value: '' }])} className="text-sm text-theme font-medium">+ Özellik ekle</button>
             </div>
             {!isNew && values.images?.length > 0 && (
               <div>
@@ -155,7 +155,7 @@ export default function AdminProductForm() {
               </div>
             )}
             <div className="flex gap-2">
-              <button type="submit" className="px-6 py-2 bg-brand-500 text-white rounded-2xl hover:bg-brand-600 font-semibold">Kaydet</button>
+              <button type="submit" className="px-6 py-2 btn-theme rounded-2xl font-semibold">Kaydet</button>
               <button type="button" onClick={() => navigate('/admin/urunler')} className="px-6 py-2 border rounded-lg">İptal</button>
             </div>
           </Form>

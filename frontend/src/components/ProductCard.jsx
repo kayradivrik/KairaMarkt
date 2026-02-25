@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { FiHeart } from 'react-icons/fi';
+import { FiHeart, FiStar } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 import { useWishlist } from '../hooks/useWishlist';
 import { useCart } from '../context/CartContext';
@@ -82,7 +82,10 @@ export default function ProductCard({ product }) {
           <span className="text-lg font-bold text-theme">{price?.toLocaleString('tr-TR')} ₺</span>
         </div>
         {product.rating > 0 && (
-          <p className="text-sm text-gray-500 mt-1">★ {product.rating?.toFixed(1)} ({product.reviewCount})</p>
+          <p className="text-sm text-gray-500 mt-1 inline-flex items-center gap-0.5">
+            <FiStar className="w-3.5 h-3.5 text-amber-500 fill-amber-500" aria-hidden />
+            {product.rating?.toFixed(1)} ({product.reviewCount})
+          </p>
         )}
         <button
           type="button"

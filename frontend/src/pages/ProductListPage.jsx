@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { getProducts, getCategories, getBrands } from '../services/productService';
 import ProductCard from '../components/ProductCard';
+import Breadcrumb from '../components/Breadcrumb';
 import { ProductCardSkeleton } from '../components/Skeleton';
 
 const SORT_OPTIONS = [
@@ -93,6 +94,7 @@ export default function ProductListPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
+      <Breadcrumb items={[{ label: 'Ana Sayfa', href: '/' }, { label: 'Ürünler' }]} />
       <h1 className="text-2xl font-bold mb-6">Ürünler</h1>
       <div className="flex flex-col lg:flex-row gap-8">
         <aside className="lg:w-64 flex-shrink-0 space-y-4">
@@ -126,7 +128,7 @@ export default function ProductListPage() {
             <select value={rating} onChange={(e) => updateParam('rating', e.target.value)} className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2">
               <option value="">Tümü</option>
               {[4, 3, 2].map((r) => (
-                <option key={r} value={r}>★ {r}+</option>
+                <option key={r} value={r}>{r}+ yıldız</option>
               ))}
             </select>
           </div>

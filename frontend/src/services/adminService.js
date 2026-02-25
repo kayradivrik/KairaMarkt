@@ -11,7 +11,11 @@ export const createProduct = (formData) => admin.post('/admin/products', formDat
 export const updateAdminProduct = (id, data) => admin.put(`/admin/products/${id}`, data);
 export const deleteProduct = (id) => admin.delete(`/admin/products/${id}`);
 export const updateStock = (id, stock) => admin.patch(`/admin/products/${id}/stock`, { stock });
-export const getAdminOrders = (page = 1, limit = 10) => admin.get(`/admin/orders?page=${page}&limit=${limit}`);
+export const getAdminOrders = (page = 1, limit = 10, status = '') => {
+  const params = new URLSearchParams({ page, limit });
+  if (status) params.set('status', status);
+  return admin.get(`/admin/orders?${params}`);
+};
 export const updateOrderStatus = (id, status) => admin.patch(`/admin/orders/${id}/status`, { status });
 export const getAdminReviews = (page = 1, limit = 10) => admin.get(`/admin/reviews?page=${page}&limit=${limit}`);
 export const deleteReview = (id) => admin.delete(`/admin/reviews/${id}`);

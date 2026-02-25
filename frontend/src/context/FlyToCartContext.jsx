@@ -1,7 +1,3 @@
-/**
- * Sepete uçan ürün animasyonu - "Oha" efekti
- * KairaMarkt - Kayra tarafından yapılmıştır
- */
 import { createContext, useContext, useRef, useState, useCallback, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useCart } from './CartContext';

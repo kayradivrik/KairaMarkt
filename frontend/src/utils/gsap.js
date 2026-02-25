@@ -1,8 +1,3 @@
-/**
- * GSAP + ScrollTrigger (CDN) - animasyon yardımcıları
- * KairaMarkt - Kayra tarafından yapılmıştır
- */
-
 export function getGSAP() {
   if (typeof window === 'undefined') return { gsap: null, ScrollTrigger: null };
   const gsap = window.gsap;
@@ -11,7 +6,6 @@ export function getGSAP() {
   return { gsap, ScrollTrigger };
 }
 
-/** Bölümü scroll'da yukarıdan fade-in + hafif yukarı. Dönen tween ile cleanup: tween.scrollTrigger?.kill() */
 export function animateSection(el, opts = {}) {
   const { gsap } = getGSAP();
   if (!gsap || !el) return null;
@@ -32,7 +26,6 @@ export function animateSection(el, opts = {}) {
   );
 }
 
-/** Çocukları sırayla (stagger) animasyonla göster */
 export function animateStagger(container, childSelector, opts = {}) {
   const { gsap } = getGSAP();
   if (!gsap || !container) return null;
@@ -56,7 +49,6 @@ export function animateStagger(container, childSelector, opts = {}) {
   );
 }
 
-/** Tek eleman fade + scale */
 export function animateReveal(el, opts = {}) {
   const { gsap } = getGSAP();
   if (!gsap || !el) return null;

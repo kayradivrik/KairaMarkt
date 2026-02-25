@@ -8,10 +8,11 @@ import { useFlyToCart } from '../context/FlyToCartContext';
 import { useAuth } from '../context/AuthContext';
 import { useRecentlyViewed } from '../hooks/useRecentlyViewed';
 import { useWishlist } from '../hooks/useWishlist';
-import { FiHeart } from 'react-icons/fi';
+import { FiHeart, FiStar } from 'react-icons/fi';
 import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
 import ProductCard from '../components/ProductCard';
+import Breadcrumb from '../components/Breadcrumb';
 import { ProductDetailSkeleton } from '../components/Skeleton';
 
 const reviewSchema = Yup.object({ rating: Yup.number().min(1).max(5).required(), comment: Yup.string() });
@@ -118,6 +119,7 @@ export default function ProductDetailPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
+      <Breadcrumb items={[{ label: 'Ana Sayfa', href: '/' }, { label: 'Ürünler', href: '/urunler' }, { label: product.name.length > 50 ? product.name.slice(0, 50) + '…' : product.name }]} />
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div className="space-y-3">
           <div className="relative aspect-square bg-gray-100 dark:bg-gray-800 rounded-xl overflow-hidden">
@@ -147,7 +149,12 @@ export default function ProductDetailPage() {
             {hasDiscount && <span className="text-gray-500 line-through">{product.price?.toLocaleString('tr-TR')} ₺</span>}
             <span className="text-2xl font-bold text-theme">{price?.toLocaleString('tr-TR')} ₺</span>
           </div>
-          {product.rating > 0 && <p className="mt-2 text-gray-600 dark:text-gray-400">★ {product.rating?.toFixed(1)} ({product.reviewCount} yorum)</p>}
+          {product.rating > 0 && (
+            <p className="mt-2 text-gray-600 dark:text-gray-400 inline-flex items-center gap-1">
+              <FiStar className="w-4 h-4 text-amber-500 fill-amber-500" aria-hidden />
+              {product.rating?.toFixed(1)} ({product.reviewCount} yorum)
+            </p>
+          )}
           <div className="mt-3 flex items-center gap-2">
             <span className="text-sm font-medium text-gray-500 dark:text-gray-400">Stok:</span>
             <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${stockVariant === 'green' ? 'bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300' : stockVariant === 'yellow' ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300' : 'bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300'}`}>
@@ -213,7 +220,10 @@ export default function ProductDetailPage() {
               </Formik>
             ) : (
               <div className="p-4 bg-gray-100 dark:bg-gray-800 rounded-lg">
-                <p>★ {myReview.rating} – {myReview.comment || '(yorum yok)'}</p>
+                <p className="inline-flex items-center gap-1">
+                <FiStar className="w-4 h-4 text-amber-500 fill-amber-500" aria-hidden />
+                {myReview.rating} – {myReview.comment || '(yorum yok)'}
+              </p>
                 <div className="mt-2 flex gap-2">
                   <button type="button" onClick={() => setReviewForm({ reviewId: myReview._id })} className="text-sm text-theme">Düzenle</button>
                   <button type="button" onClick={() => handleDeleteReview(myReview._id)} className="text-sm text-theme">Sil</button>
@@ -241,7 +251,10 @@ export default function ProductDetailPage() {
             <li key={rev._id} className="border-b border-gray-200 dark:border-gray-700 pb-4">
               <div className="flex justify-between">
                 <span className="font-medium">{rev.user?.name || 'Kullanıcı'}</span>
-                <span className="text-yellow-500">★ {rev.rating}</span>
+                <span className="text-amber-500 inline-flex items-center gap-0.5">
+                  <FiStar className="w-4 h-4 fill-amber-500" aria-hidden />
+                  {rev.rating}
+                </span>
               </div>
               <p className="text-gray-600 dark:text-gray-400 mt-1">{rev.comment || '(yorum yok)'}</p>
             </li>

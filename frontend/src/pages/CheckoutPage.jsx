@@ -7,8 +7,10 @@ import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { createOrder } from '../services/orderService';
 import { validateCoupon } from '../services/campaignService';
+import { FiAlertTriangle, FiArrowLeft } from 'react-icons/fi';
 import ProtectedRoute from '../components/ProtectedRoute';
 import OrderSuccessCelebration from '../components/OrderSuccessCelebration';
+import Breadcrumb from '../components/Breadcrumb';
 
 const shippingSchema = Yup.object({
   fullName: Yup.string().required('Ad soyad gerekli'),
@@ -118,8 +120,12 @@ function CheckoutForm() {
         }}
       />
       <div className="container mx-auto px-4 py-8">
+        <Breadcrumb items={[{ label: 'Ana Sayfa', href: '/' }, { label: 'Sepet', href: '/sepet' }, { label: 'Ödeme' }]} />
         <div className="mb-6 p-4 rounded-xl bg-amber-500/15 border-2 border-amber-500/50 text-amber-800 dark:text-amber-200">
-          <p className="font-bold">⚠️ Gerçek ödemedir — sistem para çeker.</p>
+          <p className="font-bold flex items-center gap-2">
+            <FiAlertTriangle className="w-5 h-5 flex-shrink-0" aria-hidden />
+            Gerçek ödemedir — sistem para çeker.
+          </p>
           <p className="text-sm mt-1 opacity-90">Bu sayfa gerçek ödeme altyapısına bağlıdır. Test amaçlı kullanın.</p>
         </div>
         <div className="mb-4 flex items-center justify-center gap-2 text-sm text-gray-600 dark:text-gray-400">
@@ -296,8 +302,9 @@ function CheckoutForm() {
                       </Field>
                     </div>
                   </div>
-                  <button type="button" onClick={() => setStep(1)} className="text-sm text-gray-500 dark:text-gray-400 hover:text-theme">
-                    ← Teslimat bilgilerini düzenle
+                  <button type="button" onClick={() => setStep(1)} className="text-sm text-gray-500 dark:text-gray-400 hover:text-theme inline-flex items-center gap-1.5">
+                    <FiArrowLeft className="w-4 h-4" aria-hidden />
+                    Teslimat bilgilerini düzenle
                   </button>
                 </div>
                 <div className="space-y-6 lg:sticky lg:top-24">

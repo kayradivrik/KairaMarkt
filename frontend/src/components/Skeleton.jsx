@@ -16,7 +16,6 @@ export function ProductCardSkeleton() {
   );
 }
 
-/** Ürün detay sayfası yerleşimini taklit eden skeleton */
 export function ProductDetailSkeleton() {
   return (
     <div className="container mx-auto px-4 py-8">

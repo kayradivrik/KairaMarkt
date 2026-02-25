@@ -4,6 +4,7 @@ import { FiTrash2, FiShoppingBag } from 'react-icons/fi';
 import { useCart } from '../context/CartContext';
 import { getProducts } from '../services/productService';
 import ProductCard from '../components/ProductCard';
+import Breadcrumb from '../components/Breadcrumb';
 
 export default function CartPage() {
   const { items, removeItem, updateQuantity, subtotal, tax, itemCount } = useCart();
@@ -20,6 +21,7 @@ export default function CartPage() {
   if (itemCount === 0) {
     return (
       <div className="container mx-auto px-4 py-16">
+        <Breadcrumb items={[{ label: 'Ana Sayfa', href: '/' }, { label: 'Sepet' }]} />
         <div className="max-w-lg mx-auto text-center">
           <div className="inline-flex items-center justify-center w-20 h-20 rounded-full mb-6 bg-theme-subtle text-theme">
             <FiShoppingBag className="w-10 h-10" />
@@ -46,6 +48,7 @@ export default function CartPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
+      <Breadcrumb items={[{ label: 'Ana Sayfa', href: '/' }, { label: 'Sepet' }]} />
       <h1 className="text-2xl font-bold mb-6">Sepet ({itemCount} ürün)</h1>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-4">

@@ -34,7 +34,7 @@ export default function AdminCampaigns() {
     <div>
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Kampanyalar</h1>
-        <button type="button" onClick={() => { setEditing(null); setShowForm(!showForm); }} className="px-4 py-2 bg-brand-500 text-white rounded-2xl hover:bg-brand-600 text-sm">
+        <button type="button" onClick={() => { setEditing(null); setShowForm(!showForm); }} className="px-4 py-2 btn-theme rounded-2xl text-sm">
           {showForm ? 'İptal' : 'Yeni Kampanya'}
         </button>
       </div>
@@ -110,7 +110,7 @@ export default function AdminCampaigns() {
             </div>
             <label className="flex items-center gap-2"><Field name="isActive" type="checkbox" /> Aktif</label>
             <div className="flex gap-2">
-              <button type="submit" className="px-6 py-2 bg-brand-500 text-white rounded-2xl hover:bg-brand-600">Kaydet</button>
+              <button type="submit" className="px-6 py-2 btn-theme rounded-2xl">Kaydet</button>
               <button type="button" onClick={() => { setShowForm(false); setEditing(null); }} className="px-6 py-2 border rounded-lg">İptal</button>
             </div>
           </Form>
@@ -118,7 +118,7 @@ export default function AdminCampaigns() {
       )}
 
       {loading ? (
-        <div className="flex justify-center py-12"><div className="w-10 h-10 border-2 border-brand-500 border-t-transparent rounded-full animate-spin" /></div>
+        <div className="flex justify-center py-12"><div className="w-10 h-10 border-2 border-theme border-t-transparent rounded-full animate-spin" /></div>
       ) : (
         <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
           <table className="w-full text-sm">
@@ -139,8 +139,8 @@ export default function AdminCampaigns() {
                   <td className="p-3">{c.discountType === 'percent' ? `%${c.discountValue}` : `${c.discountValue} ₺`}</td>
                   <td className="p-3">{new Date(c.startDate).toLocaleDateString('tr-TR')} - {new Date(c.endDate).toLocaleDateString('tr-TR')}</td>
                   <td className="p-3 text-right">
-                    <button type="button" onClick={() => { setEditing(c); setShowForm(true); }} className="text-brand-600 mr-2">Düzenle</button>
-                    <button type="button" onClick={() => handleDelete(c._id, c.code)} className="text-brand-600">Sil</button>
+                    <button type="button" onClick={() => { setEditing(c); setShowForm(true); }} className="text-theme mr-2">Düzenle</button>
+                    <button type="button" onClick={() => handleDelete(c._id, c.code)} className="text-theme">Sil</button>
                   </td>
                 </tr>
               ))}

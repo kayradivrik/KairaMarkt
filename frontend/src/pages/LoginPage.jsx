@@ -43,26 +43,26 @@ export default function LoginPage() {
             <Form className="space-y-4">
               <div>
                 <label className="block text-sm font-medium mb-1">E-posta</label>
-                <Field name="email" type="email" className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 focus:ring-2 focus:ring-brand-500" placeholder="ornek@email.com" />
-                {errors.email && touched.email && <p className="text-brand-600 text-sm mt-1">{errors.email}</p>}
+                <Field name="email" type="email" className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 focus:ring-2 focus:ring-2 focus:ring-theme focus:border-transparent" placeholder="ornek@email.com" />
+                {errors.email && touched.email && <p className="text-theme text-sm mt-1">{errors.email}</p>}
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">Şifre</label>
-                <Field name="password" type="password" className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 focus:ring-2 focus:ring-brand-500" />
-                {errors.password && touched.password && <p className="text-brand-600 text-sm mt-1">{errors.password}</p>}
+                <Field name="password" type="password" className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 focus:ring-2 focus:ring-2 focus:ring-theme focus:border-transparent" />
+                {errors.password && touched.password && <p className="text-theme text-sm mt-1">{errors.password}</p>}
               </div>
               <label className="flex items-center gap-2">
                 <Field name="remember" type="checkbox" className="rounded" />
                 <span className="text-sm">Beni hatırla</span>
               </label>
-              <button type="submit" disabled={loading} className="w-full py-3 bg-brand-500 text-white font-bold rounded-2xl hover:bg-brand-600 disabled:opacity-50">
+              <button type="submit" disabled={loading} className="w-full py-3 btn-theme font-bold rounded-2xl disabled:opacity-50">
                 {loading ? 'Giriş yapılıyor...' : 'Giriş Yap'}
               </button>
             </Form>
           )}
         </Formik>
         <p className="text-center mt-4 text-sm text-gray-600 dark:text-gray-400">
-          Hesabınız yok mu? <Link to="/kayit" className="text-brand-600 font-semibold">Kayıt olun</Link>
+          Hesabınız yok mu? <Link to="/kayit" className="text-theme font-semibold">Kayıt olun</Link>
         </p>
       </div>
     </div>

@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { getActiveSlides } from '../services/sliderService';
-import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
+import { FiChevronLeft, FiChevronRight, FiZap } from 'react-icons/fi';
 import { getGSAP } from '../utils/gsap';
 
 const AUTOPLAY_MS = 5000;
@@ -66,8 +66,9 @@ export default function HeroSlider() {
         <div className="absolute bottom-1/4 right-1/4 w-96 h-96 hero-theme-glow rounded-full blur-3xl animate-float-delay" style={{ opacity: 0.7 }} />
         <div className="absolute top-1/2 left-1/2 w-64 h-64 hero-theme-glow rounded-full blur-3xl animate-float" style={{ animationDelay: '-2s', opacity: 0.5 }} />
         <div className="relative container mx-auto text-center">
-          <span className="inline-block px-4 py-1.5 mb-4 text-sm font-bold bg-white/20 backdrop-blur rounded-full border border-white/30">
-            🔥 Kampanyalar devam ediyor
+          <span className="inline-flex items-center gap-2 px-4 py-1.5 mb-4 text-sm font-bold bg-white/20 backdrop-blur rounded-full border border-white/30">
+            <FiZap className="w-4 h-4" aria-hidden />
+            Kampanyalar devam ediyor
           </span>
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-4 text-white drop-shadow-lg tracking-tight">
             Teknoloji burada,<br />fırsat burada
@@ -79,7 +80,8 @@ export default function HeroSlider() {
             to="/urunler"
             className="inline-flex items-center gap-2 px-8 py-4 bg-white text-theme font-bold rounded-2xl hover:bg-gray-50 transition-all duration-200 shadow-xl hover:shadow-2xl hover:scale-105 active:scale-100"
           >
-            Ürünlere göz at →
+            Ürünlere göz at
+            <FiChevronRight className="w-5 h-5" aria-hidden />
           </Link>
         </div>
       </section>
@@ -126,7 +128,6 @@ export default function HeroSlider() {
 
         {hasMultiple && (
           <>
-            {/* Ok butonları sadece md ve üzeri (mobilde yok, kaydırma var) */}
             <button
               type="button"
               onClick={() => goTo(index - 1)}
@@ -143,7 +144,6 @@ export default function HeroSlider() {
             >
               <FiChevronRight className="w-6 h-6" />
             </button>
-            {/* Noktalar: mobilde de görünür, kaydırma ipucu */}
             <div className="absolute bottom-3 sm:bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
               {slides.map((_, i) => (
                 <button

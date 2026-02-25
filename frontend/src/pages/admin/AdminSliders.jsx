@@ -34,7 +34,7 @@ export default function AdminSliders() {
         <button
           type="button"
           onClick={() => setEditing(null)}
-          className="px-4 py-2 bg-brand-500 text-white rounded-2xl hover:bg-brand-600 text-sm font-semibold"
+          className="px-4 py-2 btn-theme rounded-2xl text-sm font-semibold"
         >
           {editing ? 'Yeni ekle' : 'Slayt ekle'}
         </button>
@@ -87,7 +87,7 @@ export default function AdminSliders() {
             Aktif (anasayfada görünsün)
           </label>
           <div className="flex gap-2">
-            <button type="submit" className="px-6 py-2 bg-brand-500 text-white rounded-2xl hover:bg-brand-600 font-semibold">
+            <button type="submit" className="px-6 py-2 btn-theme rounded-2xl font-semibold">
               {editing ? 'Güncelle' : 'Ekle'}
             </button>
             {editing && (
@@ -101,7 +101,7 @@ export default function AdminSliders() {
 
       {loading ? (
         <div className="flex justify-center py-12">
-          <div className="w-10 h-10 border-2 border-brand-500 border-t-transparent rounded-full animate-spin" />
+          <div className="w-10 h-10 border-2 border-theme border-t-transparent rounded-full animate-spin" />
         </div>
       ) : (
         <div className="space-y-4">
@@ -119,7 +119,7 @@ export default function AdminSliders() {
                 <p className="text-xs text-gray-400 mt-1">Sıra: {s.order} · {s.isActive ? 'Aktif' : 'Pasif'}</p>
               </div>
               <div className="flex gap-2">
-                <button type="button" onClick={() => setEditing(s)} className="px-4 py-2 text-brand-600 font-medium rounded-xl border border-brand-500">
+                <button type="button" onClick={() => setEditing(s)} className="px-4 py-2 text-theme font-medium rounded-xl border border-theme">
                   Düzenle
                 </button>
                 <button type="button" onClick={() => handleDelete(s._id)} className="px-4 py-2 text-red-600 font-medium rounded-xl border border-red-500">

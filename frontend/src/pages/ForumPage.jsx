@@ -1,7 +1,3 @@
-/**
- * Forum - gelişmiş, tema uyumlu, mobil dostu
- * KairaMarkt - Kayra tarafından yapılmıştır
- */
 import { useState, useEffect, useMemo } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { getTopics, getTopicBySlug, createTopic, createPost } from '../services/forumService';
