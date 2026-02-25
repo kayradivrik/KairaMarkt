@@ -46,7 +46,8 @@ export const getProductBySlug = async (req, res, next) => {
   try {
     const product = await Product.findOne({ slug: req.params.slug, isActive: true }).lean();
     if (!product) return res.status(404).json({ success: false, message: 'Ürün bulunamadı' });
-    res.json({ success: true, product });
+    await Product.findByIdAndUpdate(product._id, { $inc: { viewCount: 1 } });
+    res.json({ success: true, product: { ...product, viewCount: (product.viewCount || 0) + 1 } });
   } catch (err) {
     next(err);
   }

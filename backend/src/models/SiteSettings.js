@@ -36,6 +36,9 @@ const siteSettingsSchema = new mongoose.Schema(
     footerBadge3: { type: String, default: '' },
     footerBadge4: { type: String, default: '' },
     footerBottomText: { type: String, default: '' },
+    announcementBarText: { type: String, default: '' },
+    announcementBarEnabled: { type: Boolean, default: false },
+    maintenanceMode: { type: Boolean, default: false },
   },
   { timestamps: true }
 );

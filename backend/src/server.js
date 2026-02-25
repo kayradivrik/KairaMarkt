@@ -12,6 +12,7 @@ import mongoSanitize from 'express-mongo-sanitize';
 import rateLimit from 'express-rate-limit';
 import connectDB from './config/db.js';
 import errorHandler from './middlewares/errorHandler.js';
+import Product from './models/Product.js';
 import authRoutes from './routes/authRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import productRoutes from './routes/productRoutes.js';
@@ -24,6 +25,9 @@ import sliderRoutes from './routes/sliderRoutes.js';
 import faqRoutes from './routes/faqRoutes.js';
 import forumRoutes from './routes/forumRoutes.js';
 import settingsRoutes from './routes/settingsRoutes.js';
+import newsletterRoutes from './routes/newsletterRoutes.js';
+import contactRoutes from './routes/contactRoutes.js';
+import stockAlertRoutes from './routes/stockAlertRoutes.js';
 
 await connectDB();
 
@@ -81,8 +85,32 @@ app.use('/api/sliders', sliderRoutes);
 app.use('/api/faq', faqRoutes);
 app.use('/api/forum', forumRoutes);
 app.use('/api/settings', settingsRoutes);
+app.use('/api/newsletter', newsletterRoutes);
+app.use('/api/contact', contactRoutes);
+app.use('/api/stock-alert', stockAlertRoutes);
 
 app.get('/api/health', (_, res) => res.json({ ok: true }));
+
+app.get('/sitemap.xml', async (_req, res, next) => {
+  try {
+    const base = process.env.FRONTEND_URL || 'http://localhost:5173';
+    const products = await Product.find({ isActive: true }).select('slug updatedAt').limit(5000).lean();
+    const urls = [
+      { loc: base + '/', priority: '1.0' },
+      { loc: base + '/urunler', priority: '0.9' },
+      { loc: base + '/kampanyalar', priority: '0.8' },
+      { loc: base + '/iletisim', priority: '0.7' },
+      ...products.map((p) => ({ loc: `${base}/urun/${p.slug || p._id}`, priority: '0.8', lastmod: p.updatedAt })),
+    ];
+    const xml = '<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' +
+      urls.map((u) => `<url><loc>${u.loc}</loc>${u.lastmod ? `<lastmod>${new Date(u.lastmod).toISOString().slice(0, 10)}</lastmod>` : ''}<priority>${u.priority || '0.5'}</priority></url>`).join('') +
+      '</urlset>';
+    res.setHeader('Content-Type', 'application/xml');
+    res.send(xml);
+  } catch (err) {
+    next(err);
+  }
+});
 
 // SPA fallback: frontend build varsa statik dosyaları sun, tüm GET isteklerinde (API hariç) index.html dön → F5 /sepet vb. çalışır
 const clientBuild = path.resolve(process.env.CLIENT_BUILD_PATH || path.join(__dirname, '..', '..', 'frontend', 'dist'));

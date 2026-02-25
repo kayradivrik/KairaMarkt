@@ -36,6 +36,9 @@ const defaults = {
   footerBadge3: '',
   footerBadge4: '',
   footerBottomText: '',
+  announcementBarText: '',
+  announcementBarEnabled: false,
+  maintenanceMode: false,
 };
 
 const SettingsContext = createContext(defaults);

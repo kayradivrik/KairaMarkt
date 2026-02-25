@@ -3,6 +3,7 @@ import toast from 'react-hot-toast';
 import { FiMail, FiPhone, FiMapPin, FiClock, FiSend } from 'react-icons/fi';
 import { useSettings } from '../context/SettingsContext';
 import Breadcrumb from '../components/Breadcrumb';
+import { submit as submitContact } from '../services/contactService';
 
 export default function ContactPage() {
   const { contactEmail, contactPhone, address, workingHours } = useSettings();
@@ -17,11 +18,13 @@ export default function ContactPage() {
   const handleSubmit = (e) => {
     e.preventDefault();
     setSending(true);
-    setTimeout(() => {
-      setForm({ name: '', email: '', subject: '', message: '' });
-      setSending(false);
-      toast.success('Mesajınız alındı. En kısa sürede dönüş yapacağız.');
-    }, 600);
+    submitContact(form)
+      .then(() => {
+        setForm({ name: '', email: '', subject: '', message: '' });
+        toast.success('Mesajınız alındı. En kısa sürede dönüş yapacağız.');
+      })
+      .catch((err) => toast.error(err.message || 'Gönderilemedi.'))
+      .finally(() => setSending(false));
   };
 
   const contactItems = [

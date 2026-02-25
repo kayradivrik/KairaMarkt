@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { getAdminProducts, deleteProduct, updateStock } from '../../services/adminService';
+import { getAdminProducts, deleteProduct, updateStock, duplicateProduct } from '../../services/adminService';
 
 export default function AdminProducts() {
+  const navigate = useNavigate();
   const [products, setProducts] = useState([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
@@ -33,6 +34,12 @@ export default function AdminProducts() {
   const handleStockSave = (id, value) => {
     updateStock(id, parseInt(value, 10))
       .then(() => { toast.success('Stok güncellendi'); setEditingStock(null); load(); })
+      .catch((e) => toast.error(e.message));
+  };
+
+  const handleDuplicate = (id) => {
+    duplicateProduct(id)
+      .then((r) => { toast.success('Ürün kopyalandı'); if (r.data?.product?._id) navigate(`/admin/urunler/${r.data.product._id}`); else load(); })
       .catch((e) => toast.error(e.message));
   };
 
@@ -76,6 +83,7 @@ export default function AdminProducts() {
                     <td className="p-3">{p.isActive ? 'Aktif' : 'Pasif'}</td>
                     <td className="p-3 text-right">
                       <Link to={`/admin/urunler/${p._id}`} className="text-theme mr-2">Düzenle</Link>
+                      <button type="button" onClick={() => handleDuplicate(p._id)} className="text-theme mr-2">Kopyala</button>
                       <button type="button" onClick={() => handleDelete(p._id, p.name)} className="text-theme">Sil</button>
                     </td>
                   </tr>

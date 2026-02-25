@@ -13,7 +13,9 @@ import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
 import ProductCard from '../components/ProductCard';
 import Breadcrumb from '../components/Breadcrumb';
+import ShareProduct from '../components/ShareProduct';
 import { ProductDetailSkeleton } from '../components/Skeleton';
+import { subscribe as subscribeStockAlert } from '../services/stockAlertService';
 
 const reviewSchema = Yup.object({ rating: Yup.number().min(1).max(5).required(), comment: Yup.string() });
 
@@ -25,6 +27,8 @@ export default function ProductDetailPage() {
   const [reviewForm, setReviewForm] = useState(null);
   const [similarProducts, setSimilarProducts] = useState([]);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [stockAlertEmail, setStockAlertEmail] = useState('');
+  const [stockAlertSent, setStockAlertSent] = useState(false);
   const { addItem } = useCart();
   const fly = useFlyToCart();
   const { user } = useAuth();
@@ -159,12 +163,35 @@ export default function ProductDetailPage() {
               {product.rating?.toFixed(1)} ({product.reviewCount} yorum)
             </p>
           )}
-          <div className="mt-3 flex items-center gap-2">
+          {(product.viewCount > 0 || product.salesCount > 0) && (
+            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+              {product.viewCount > 0 && <span>{product.viewCount} görüntülenme</span>}
+              {product.viewCount > 0 && product.salesCount > 0 && ' · '}
+              {product.salesCount > 0 && <span>{product.salesCount} satış</span>}
+            </p>
+          )}
+          <div className="mt-3 flex flex-wrap items-center gap-2">
+            <ShareProduct product={product} />
+          </div>
+          <div className="mt-3 flex flex-wrap items-center gap-2">
             <span className="text-sm font-medium text-gray-500 dark:text-gray-400">Stok:</span>
             <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${stockVariant === 'green' ? 'bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300' : stockVariant === 'yellow' ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300' : 'bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300'}`}>
               {stockNum > 10 ? 'Yeterli stok' : stockNum >= 1 ? 'Son birkaç ürün' : 'Stokta yok'}
             </span>
           </div>
+          {stockNum === 0 && (
+            <div className="mt-3 p-3 rounded-xl bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Stokta olduğunda e-posta ile bilgilendirilmek ister misiniz?</p>
+              {stockAlertSent ? (
+                <p className="text-sm text-green-600 dark:text-green-400 font-medium">Kaydınız alındı. Stokta olduğunda bilgilendirileceksiniz.</p>
+              ) : (
+                <form onSubmit={(e) => { e.preventDefault(); if (!stockAlertEmail.trim()) return; subscribeStockAlert(product._id, stockAlertEmail).then(() => { setStockAlertSent(true); toast.success('Kaydınız alındı.'); }).catch((err) => toast.error(err.message)); }} className="flex gap-2">
+                  <input type="email" value={stockAlertEmail} onChange={(e) => setStockAlertEmail(e.target.value)} placeholder="E-posta" className="flex-1 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm" required />
+                  <button type="submit" className="px-4 py-2 rounded-lg btn-theme text-sm font-medium">Bildir</button>
+                </form>
+              )}
+            </div>
+          )}
           <div className="mt-4">
             <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 mb-1">Ürün açıklaması</h3>
             <p className="text-gray-700 dark:text-gray-300 whitespace-pre-line leading-relaxed">{product.description || 'Bu ürün için henüz açıklama eklenmemiş.'}</p>

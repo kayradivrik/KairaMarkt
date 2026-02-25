@@ -17,6 +17,8 @@ export const getAdminOrders = (page = 1, limit = 10, status = '') => {
   return admin.get(`/admin/orders?${params}`);
 };
 export const updateOrderStatus = (id, status) => admin.patch(`/admin/orders/${id}/status`, { status });
+export const bulkUpdateOrderStatus = (orderIds, status) => admin.patch('/admin/orders/bulk-status', { orderIds, status });
+export const exportOrdersCsv = () => admin.get('/admin/orders/export-csv', { responseType: 'blob' });
 export const getAdminReviews = (page = 1, limit = 10) => admin.get(`/admin/reviews?page=${page}&limit=${limit}`);
 export const deleteReview = (id) => admin.delete(`/admin/reviews/${id}`);
 export const getCampaigns = () => admin.get('/admin/campaigns');
@@ -31,3 +33,8 @@ export const deleteSlider = (id) => admin.delete(`/admin/sliders/${id}`);
 export const getSettings = () => admin.get('/admin/settings');
 export const updateSettings = (data) => admin.put('/admin/settings', data);
 export const uploadLogo = (formData) => admin.post('/admin/settings/logo', formData);
+export const getFaqList = () => admin.get('/admin/faq');
+export const createFaq = (data) => admin.post('/admin/faq', data);
+export const updateFaq = (id, data) => admin.put(`/admin/faq/${id}`, data);
+export const deleteFaq = (id) => admin.delete(`/admin/faq/${id}`);
+export const duplicateProduct = (id) => admin.post(`/admin/products/${id}/duplicate`);

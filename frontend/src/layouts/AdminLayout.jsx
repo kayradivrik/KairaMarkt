@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import { FiGrid, FiImage, FiPackage, FiUsers, FiShoppingBag, FiMessageSquare, FiTag, FiFileText, FiSettings, FiExternalLink, FiMenu, FiX } from 'react-icons/fi';
+import { FiGrid, FiImage, FiPackage, FiUsers, FiShoppingBag, FiMessageSquare, FiTag, FiFileText, FiSettings, FiExternalLink, FiMenu, FiX, FiHelpCircle } from 'react-icons/fi';
 import { useSettings } from '../context/SettingsContext';
 import ProtectedRoute from '../components/ProtectedRoute';
 
@@ -13,6 +13,7 @@ const links = [
   { to: '/admin/yorumlar', icon: FiMessageSquare, label: 'Yorumlar' },
   { to: '/admin/kampanyalar', icon: FiTag, label: 'Kampanyalar' },
   { to: '/admin/loglar', icon: FiFileText, label: 'Loglar' },
+  { to: '/admin/sss', icon: FiHelpCircle, label: 'SSS' },
   { to: '/admin/ayarlar', icon: FiSettings, label: 'Site ayarları' },
 ];
 

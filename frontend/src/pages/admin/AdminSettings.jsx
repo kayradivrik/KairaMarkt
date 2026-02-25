@@ -39,6 +39,9 @@ const defaultSettings = {
   footerBadge3: '',
   footerBadge4: '',
   footerBottomText: '',
+  announcementBarText: '',
+  announcementBarEnabled: false,
+  maintenanceMode: false,
 };
 
 function Field({ label, children }) {
@@ -102,6 +105,9 @@ export default function AdminSettings() {
     footerBadge3: settings.footerBadge3,
     footerBadge4: settings.footerBadge4,
     footerBottomText: settings.footerBottomText,
+    announcementBarText: settings.announcementBarText,
+    announcementBarEnabled: settings.announcementBarEnabled,
+    maintenanceMode: settings.maintenanceMode,
   });
 
   const handleSubmit = (e) => {
@@ -431,6 +437,41 @@ export default function AdminSettings() {
               placeholder="https://instagram.com/..."
             />
           </Field>
+        </div>
+
+        <div className={sectionClass}>
+          <h2 className="font-semibold text-gray-900 dark:text-white flex items-center gap-2 mb-2">
+            <FiShare2 className="w-5 h-5" /> Duyuru & Bakım
+          </h2>
+          <Field label="Üst duyuru metni (isteğe bağlı)">
+            <input
+              type="text"
+              value={settings.announcementBarText || ''}
+              onChange={(e) => setSettings((s) => ({ ...s, announcementBarText: e.target.value }))}
+              className={inputClass}
+              placeholder="Örn: Ücretsiz kargo 500 TL üzeri siparişlerde!"
+            />
+          </Field>
+          <div className="flex items-center gap-2 mt-2">
+            <input
+              type="checkbox"
+              id="announcementBarEnabled"
+              checked={!!settings.announcementBarEnabled}
+              onChange={(e) => setSettings((s) => ({ ...s, announcementBarEnabled: e.target.checked }))}
+              className="rounded border-gray-300 dark:border-gray-600"
+            />
+            <label htmlFor="announcementBarEnabled" className="text-sm font-medium">Duyuru çubuğunu göster</label>
+          </div>
+          <div className="flex items-center gap-2 mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+            <input
+              type="checkbox"
+              id="maintenanceMode"
+              checked={!!settings.maintenanceMode}
+              onChange={(e) => setSettings((s) => ({ ...s, maintenanceMode: e.target.checked }))}
+              className="rounded border-gray-300 dark:border-gray-600"
+            />
+            <label htmlFor="maintenanceMode" className="text-sm font-medium text-amber-600 dark:text-amber-400">Bakım modu (ziyaretçilere bakım sayfası göster, admin girişi normal)</label>
+          </div>
         </div>
 
         <div className={sectionClass}>

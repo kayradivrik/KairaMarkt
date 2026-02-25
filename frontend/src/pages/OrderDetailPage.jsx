@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { getOrderById } from '../services/orderService';
-import { FiArrowLeft, FiPackage, FiMapPin, FiCheck } from 'react-icons/fi';
+import { FiArrowLeft, FiPackage, FiMapPin, FiCheck, FiPrinter } from 'react-icons/fi';
 import ProtectedRoute from '../components/ProtectedRoute';
 import Breadcrumb from '../components/Breadcrumb';
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -66,10 +66,16 @@ function OrderDetailContent() {
     <div className="container mx-auto px-4 py-8 max-w-3xl">
       <Breadcrumb items={[{ label: 'Ana Sayfa', href: '/' }, { label: 'Siparişlerim', href: '/siparislerim' }, { label: `#${order._id.slice(-8).toUpperCase()}` }]} />
 
-      <Link to="/siparislerim" className="inline-flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-theme font-medium mb-6 transition-colors">
-        <FiArrowLeft className="w-4 h-4" aria-hidden />
-        Siparişlerime dön
-      </Link>
+      <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+        <Link to="/siparislerim" className="inline-flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-theme font-medium transition-colors">
+          <FiArrowLeft className="w-4 h-4" aria-hidden />
+          Siparişlerime dön
+        </Link>
+        <button type="button" onClick={() => window.print()} className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 text-sm font-medium print:hidden">
+          <FiPrinter className="w-4 h-4" aria-hidden />
+          Yazdır
+        </button>
+      </div>
 
       <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6 mb-6 shadow-soft">
         <div className="flex flex-wrap items-center justify-between gap-4">

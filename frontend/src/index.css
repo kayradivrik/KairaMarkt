@@ -87,6 +87,12 @@ body.dark {
 }
 .hero-theme-glow { background-color: color-mix(in srgb, var(--site-primary) 35%, transparent); }
 
+@keyframes progressBar {
+  0% { transform: scaleX(0); transform-origin: left; }
+  50% { transform: scaleX(0.7); transform-origin: left; }
+  100% { transform: scaleX(1); transform-origin: right; }
+}
+
 @keyframes marquee {
   0% { transform: translateX(0); }
   100% { transform: translateX(-50%); }
@@ -410,4 +416,9 @@ body.dark {
 }
 @media (min-width: 768px) {
   .forum-topic-cards { display: none; }
+}
+
+@media print {
+  nav, footer, .skip-link, [class*="ScrollToTop"], [class*="CookieConsent"], [class*="AnnouncementBar"], [class*="RouteChangeProgressBar"], .print\\:hidden { display: none !important; }
+  body { background: #fff; }
 }

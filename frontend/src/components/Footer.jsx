@@ -1,7 +1,10 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { FiShield, FiTruck, FiCreditCard, FiRefreshCw } from 'react-icons/fi';
+import { FiShield, FiTruck, FiCreditCard, FiRefreshCw, FiMail } from 'react-icons/fi';
+import toast from 'react-hot-toast';
 import { useSettings } from '../context/SettingsContext';
 import { useTheme } from '../context/ThemeContext';
+import { subscribe as newsletterSubscribe } from '../services/newsletterService';
 
 export default function Footer() {
   const {
@@ -37,6 +40,18 @@ export default function Footer() {
   const accent = primaryColor || '#b91c1c';
   const bg = footerBgColor || (dark ? '#030712' : '#111827');
   const textColor = footerTextColor || '#d1d5db';
+  const [newsletterEmail, setNewsletterEmail] = useState('');
+  const [newsletterLoading, setNewsletterLoading] = useState(false);
+
+  const handleNewsletter = (e) => {
+    e.preventDefault();
+    if (!newsletterEmail.trim()) return;
+    setNewsletterLoading(true);
+    newsletterSubscribe(newsletterEmail.trim())
+      .then((r) => { toast.success(r.data?.message || 'Abone oldunuz.'); setNewsletterEmail(''); })
+      .catch((err) => toast.error(err.message || 'İşlem başarısız.'))
+      .finally(() => setNewsletterLoading(false));
+  };
 
   return (
     <footer
@@ -68,13 +83,31 @@ export default function Footer() {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 py-10">
           <div>
-            <h3 className="font-extrabold text-lg mb-3" style={{ color: accent }}>{siteName || 'KairaMarkt'}</h3>
+            <div>
+              <h3 className="font-extrabold text-lg mb-3" style={{ color: accent }}>{siteName || 'KairaMarkt'}</h3>
             <p className="text-sm leading-relaxed" style={{ color: textColor }}>
               {footerText || 'Teknoloji ve elektronik ürünlerde uygun fiyat, hızlı teslimat.'}
             </p>
             {contactEmail && (
               <p className="text-sm mt-3" style={{ color: textColor, opacity: 0.9 }}>{contactEmail}</p>
             )}
+            </div>
+            <form onSubmit={handleNewsletter} className="mt-6 flex flex-col sm:flex-row gap-2 max-w-xs">
+              <div className="flex-1 flex items-center gap-2 rounded-lg overflow-hidden border border-white/20 bg-white/5">
+                <FiMail className="w-5 h-5 ml-3 opacity-70" style={{ color: textColor }} />
+                <input
+                  type="email"
+                  value={newsletterEmail}
+                  onChange={(e) => setNewsletterEmail(e.target.value)}
+                  placeholder="E-posta (bülten)"
+                  className="flex-1 min-w-0 py-2.5 bg-transparent text-sm placeholder-white/50 outline-none"
+                  style={{ color: textColor }}
+                />
+              </div>
+              <button type="submit" disabled={newsletterLoading} className="px-4 py-2.5 rounded-lg font-medium text-sm disabled:opacity-50" style={{ backgroundColor: accent, color: '#fff' }}>
+                {newsletterLoading ? '...' : 'Abone ol'}
+              </button>
+            </form>
           </div>
           <div>
             <h4 className="font-medium mb-4" style={{ color: textColor }}>{footerSectionKurumsal || 'Kurumsal'}</h4>

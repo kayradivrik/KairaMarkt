@@ -1,0 +1,11 @@
+{
+  "name": "KairaMarkt",
+  "short_name": "KairaMarkt",
+  "description": "Online alışveriş",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#b91c1c",
+  "orientation": "portrait-primary",
+  "icons": []
+}

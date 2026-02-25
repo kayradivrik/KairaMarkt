@@ -63,6 +63,12 @@ export default function ProductCard({ product }) {
             %{Math.round((1 - product.discountPrice / product.price) * 100)}
           </span>
         )}
+        {product.createdAt && (Date.now() - new Date(product.createdAt).getTime() < 30 * 24 * 60 * 60 * 1000) && !hasDiscount && (
+          <span className="absolute top-2 left-2 bg-green-500 text-white text-xs font-bold px-2 py-0.5 rounded-xl">Yeni</span>
+        )}
+        {product.salesCount >= 10 && (
+          <span className="absolute top-2 right-10 bg-amber-500 text-white text-xs font-bold px-2 py-0.5 rounded-xl">Çok Satan</span>
+        )}
         <button
           type="button"
           onClick={(e) => { e.preventDefault(); toggle(product._id); }}

@@ -27,6 +27,13 @@ import {
   getSettings,
   updateSettings,
   uploadLogo as uploadLogoHandler,
+  getFaqList,
+  createFaq,
+  updateFaq,
+  deleteFaq,
+  duplicateProduct,
+  bulkUpdateOrderStatus,
+  exportOrdersCsv,
 } from '../controllers/adminController.js';
 
 const router = express.Router();
@@ -47,6 +54,8 @@ router.patch('/products/:id/stock', updateStock);
 
 router.get('/orders', getAdminOrders);
 router.patch('/orders/:id/status', updateOrderStatus);
+router.patch('/orders/bulk-status', bulkUpdateOrderStatus);
+router.get('/orders/export-csv', exportOrdersCsv);
 
 router.get('/reviews', getAdminReviews);
 router.delete('/reviews/:id', deleteReview);
@@ -64,5 +73,12 @@ router.delete('/sliders/:id', deleteSlider);
 router.get('/settings', getSettings);
 router.put('/settings', updateSettings);
 router.post('/settings/logo', uploadLogoMiddleware.single('logo'), uploadLogoHandler);
+
+router.get('/faq', getFaqList);
+router.post('/faq', createFaq);
+router.put('/faq/:id', updateFaq);
+router.delete('/faq/:id', deleteFaq);
+
+router.post('/products/:id/duplicate', duplicateProduct);
 
 export default router;

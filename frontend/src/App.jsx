@@ -36,6 +36,7 @@ const AdminCampaigns = lazy(() => import('./pages/admin/AdminCampaigns'));
 const AdminLogs = lazy(() => import('./pages/admin/AdminLogs'));
 const AdminSliders = lazy(() => import('./pages/admin/AdminSliders'));
 const AdminSettings = lazy(() => import('./pages/admin/AdminSettings'));
+const AdminFaq = lazy(() => import('./pages/admin/AdminFaq'));
 
 function PageFallback() {
   return (
@@ -62,6 +63,7 @@ export default function App() {
           <Route path="yorumlar" element={<Suspense fallback={<PageFallback />}><AdminReviews /></Suspense>} />
           <Route path="kampanyalar" element={<Suspense fallback={<PageFallback />}><AdminCampaigns /></Suspense>} />
           <Route path="loglar" element={<Suspense fallback={<PageFallback />}><AdminLogs /></Suspense>} />
+          <Route path="sss" element={<Suspense fallback={<PageFallback />}><AdminFaq /></Suspense>} />
           <Route path="ayarlar" element={<Suspense fallback={<PageFallback />}><AdminSettings /></Suspense>} />
         </Route>
         <Route path="/" element={<MainLayout />}>

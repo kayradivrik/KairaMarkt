@@ -35,6 +35,9 @@ const DEFAULTS = {
   footerBadge3: '',
   footerBadge4: '',
   footerBottomText: '',
+  announcementBarText: '',
+  announcementBarEnabled: false,
+  maintenanceMode: false,
 };
 
 export const getPublicSettings = async (_req, res, next) => {

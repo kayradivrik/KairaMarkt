@@ -22,6 +22,7 @@ const productSchema = new mongoose.Schema(
     rating: { type: Number, default: 0, min: 0, max: 5 },
     reviewCount: { type: Number, default: 0 },
     salesCount: { type: Number, default: 0 },
+    viewCount: { type: Number, default: 0 },
     featured: { type: Boolean, default: false },
     variants: [variantSchema],
     isActive: { type: Boolean, default: true },

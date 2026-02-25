@@ -204,6 +204,43 @@ export const updateOrderStatus = async (req, res, next) => {
   }
 };
 
+export const bulkUpdateOrderStatus = async (req, res, next) => {
+  try {
+    const { orderIds, status } = req.body || {};
+    if (!Array.isArray(orderIds) || orderIds.length === 0 || !status) {
+      return res.status(400).json({ success: false, message: 'orderIds ve status gerekli' });
+    }
+    const result = await Order.updateMany({ _id: { $in: orderIds } }, { $set: { status } });
+    await logAction(req.user._id, 'BULK_UPDATE_ORDER_STATUS', 'orders', { count: result.modifiedCount, status }, req.ip);
+    res.json({ success: true, modifiedCount: result.modifiedCount });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const exportOrdersCsv = async (req, res, next) => {
+  try {
+    const limit = Math.min(5000, Math.max(1, parseInt(req.query.limit) || 500));
+    const orders = await Order.find().sort({ createdAt: -1 }).populate('user', 'name email').limit(limit).lean();
+    const header = 'Sipariş ID,Tarih,Müşteri,E-posta,Toplam,Durum\n';
+    const rows = orders.map((o) => {
+      const id = (o._id || '').toString();
+      const date = o.createdAt ? new Date(o.createdAt).toISOString().slice(0, 10) : '';
+      const name = (o.user?.name || '').replace(/"/g, '""');
+      const email = (o.user?.email || '').replace(/"/g, '""');
+      const total = (o.total ?? 0).toString().replace('.', ',');
+      const status = (o.status || '').replace(/"/g, '""');
+      return `"${id}","${date}","${name}","${email}","${total}","${status}"`;
+    });
+    const csv = '\uFEFF' + header + rows.join('\n');
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+    res.setHeader('Content-Disposition', `attachment; filename=siparisler-${Date.now()}.csv`);
+    res.send(csv);
+  } catch (err) {
+    next(err);
+  }
+};
+
 export const getAdminReviews = async (req, res, next) => {
   try {
     const page = Math.max(1, parseInt(req.query.page) || 1);
@@ -366,6 +403,9 @@ const SETTINGS_DEFAULTS = {
   footerBadge3: '',
   footerBadge4: '',
   footerBottomText: '',
+  announcementBarText: '',
+  announcementBarEnabled: false,
+  maintenanceMode: false,
 };
 
 export const getSettings = async (_req, res, next) => {
@@ -415,6 +455,9 @@ export const updateSettings = async (req, res, next) => {
     if (body.footerBadge3 != null) update.footerBadge3 = String(body.footerBadge3).trim();
     if (body.footerBadge4 != null) update.footerBadge4 = String(body.footerBadge4).trim();
     if (body.footerBottomText != null) update.footerBottomText = String(body.footerBottomText).trim();
+    if (body.announcementBarText != null) update.announcementBarText = String(body.announcementBarText).trim();
+    if (body.announcementBarEnabled != null) update.announcementBarEnabled = !!body.announcementBarEnabled;
+    if (body.maintenanceMode != null) update.maintenanceMode = !!body.maintenanceMode;
     const doc = await SiteSettings.findOneAndUpdate({}, { $set: update }, { new: true, upsert: true }).lean();
     await logAction(req.user._id, 'UPDATE_SETTINGS', 'site', update, req.ip);
     res.json({ success: true, settings: { ...SETTINGS_DEFAULTS, ...doc } });
@@ -430,6 +473,68 @@ export const uploadLogo = async (req, res, next) => {
     await SiteSettings.findOneAndUpdate({}, { $set: { logoUrl: url, showLogo: true } }, { new: true, upsert: true });
     await logAction(req.user._id, 'UPLOAD_LOGO', 'site', {}, req.ip);
     res.json({ success: true, logoUrl: url });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const getFaqList = async (_req, res, next) => {
+  try {
+    const list = await Faq.find().sort({ order: 1 }).lean();
+    res.json({ success: true, list });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const createFaq = async (req, res, next) => {
+  try {
+    const faq = await Faq.create(req.body || {});
+    await logAction(req.user._id, 'CREATE_FAQ', 'faq', { id: faq._id }, req.ip);
+    res.status(201).json({ success: true, faq });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const updateFaq = async (req, res, next) => {
+  try {
+    const faq = await Faq.findByIdAndUpdate(req.params.id, req.body || {}, { new: true }).lean();
+    if (!faq) return res.status(404).json({ success: false, message: 'SSS bulunamadı' });
+    await logAction(req.user._id, 'UPDATE_FAQ', 'faq', { id: faq._id }, req.ip);
+    res.json({ success: true, faq });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const deleteFaq = async (req, res, next) => {
+  try {
+    await Faq.findByIdAndDelete(req.params.id);
+    await logAction(req.user._id, 'DELETE_FAQ', 'faq', { id: req.params.id }, req.ip);
+    res.json({ success: true });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const duplicateProduct = async (req, res, next) => {
+  try {
+    const orig = await Product.findById(req.params.id);
+    if (!orig) return res.status(404).json({ success: false, message: 'Ürün bulunamadı' });
+    const doc = orig.toObject();
+    delete doc._id;
+    delete doc.createdAt;
+    delete doc.updatedAt;
+    doc.name = (doc.name || '') + ' (Kopya)';
+    doc.slug = '';
+    doc.salesCount = 0;
+    doc.reviewCount = 0;
+    doc.viewCount = 0;
+    doc.rating = 0;
+    const product = await Product.create(doc);
+    await logAction(req.user._id, 'DUPLICATE_PRODUCT', 'product', { from: req.params.id, to: product._id }, req.ip);
+    res.status(201).json({ success: true, product });
   } catch (err) {
     next(err);
   }
