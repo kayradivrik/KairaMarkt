@@ -81,3 +81,19 @@
 - Render’da **Health Check Path** (opsiyonel): backend için `/api/health` kullanılabilir; route yoksa boş bırak.
 
 **Geliştirme – Port 5001 dolu (EADDRINUSE):** Önce `netstat -ano | findstr :5001` ile PID’i bulun, sonra `taskkill /F /PID <PID>` ile kapatın. Veya backend’i çalıştırdığınız terminali kapatıp yeniden açın.
+
+---
+
+## Deploy'da ayarlar / özellikler güncellenmiyorsa
+
+Lokalde çalışıp deploy'da admin ayarları, ürün düzenleme, sipariş durumu vb. kaydedilmiyorsa frontend büyük ihtimalle API isteklerini backend'e gönderemiyordur.
+
+**1. VITE_API_URL (Frontend)**  
+- Build sırasında set edilmeli. Render Static Site → Environment → `VITE_API_URL` = backend URL (örn. `https://xxx-api.onrender.com`, sonda / yok).  
+- Sonradan eklerseniz **mutlaka yeniden build** alın (Manual Deploy veya Clear build cache & Deploy).
+
+**2. FRONTEND_URL (Backend)**  
+- Backend → Environment → `FRONTEND_URL` = tarayıcıda gördüğünüz frontend adresi (CORS için).  
+- www + non-www kullanıyorsanız: `https://site.com,https://www.site.com` (virgülle ayırın).
+
+**3. Test:** F12 → Network → Admin'de bir şey kaydedin. Request URL backend adresinizle başlamıyorsa `VITE_API_URL` build'e girmemiştir. CORS hatası varsa `FRONTEND_URL` tam eşleşmiyordur.

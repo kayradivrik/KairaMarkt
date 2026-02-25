@@ -1,7 +1,14 @@
 import axios from 'axios';
 
+// Production'da deploy edilen frontend mutlaka backend URL'ini bilmeli.
+// Render/Vercel vb.: Environment Variables'a VITE_API_URL ekleyin (örn. https://xxx-api.onrender.com).
+// Build bu değişkenle yapılır; sonradan eklemek işe yaramaz, yeniden build gerekir.
+const apiBase =
+  (typeof window !== 'undefined' && window.__VITE_API_URL__) ||
+  (import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL.replace(/\/$/, '')}/api` : '/api');
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/api` : '/api',
+  baseURL: apiBase,
   withCredentials: true,
   headers: { 'Content-Type': 'application/json' },
   timeout: 30000,

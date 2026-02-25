@@ -35,14 +35,21 @@ const app = express();
 const PORT = process.env.PORT || 5001;
 
 app.use(helmet());
+// FRONTEND_URL virgülle ayrılmış birden fazla adres olabilir (örn. https://site.com,https://www.site.com)
 const allowedOrigins = [
-  process.env.FRONTEND_URL,
   'http://localhost:5173',
+  'http://localhost:3000',
+  ...(process.env.FRONTEND_URL || '').split(',').map((u) => u.trim()).filter(Boolean),
 ].filter(Boolean);
 
 app.use(cors({
   origin(origin, cb) {
-    if (!origin || allowedOrigins.includes(origin)) return cb(null, true);
+    // Origin yoksa (örn. same-origin, Postman) kabul et
+    if (!origin) return cb(null, true);
+    if (allowedOrigins.includes(origin)) return cb(null, true);
+    // Trailing slash farkı: https://site.com ve https://site.com/ aynı sayılır
+    const originNorm = origin.replace(/\/$/, '');
+    if (allowedOrigins.some((o) => o.replace(/\/$/, '') === originNorm)) return cb(null, true);
     cb(new Error('CORS policy: origin not allowed'));
   },
   credentials: true,
