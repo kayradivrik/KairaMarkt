@@ -50,6 +50,20 @@ export default function App() {
     <>
       <Toaster position="top-right" toastOptions={{ duration: 4000 }} />
       <Routes>
+        {/* Admin route'ları önce tanımlanmalı, aksi halde path="/" hepsini yakalayabilir */}
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route index element={<Suspense fallback={<PageFallback />}><AdminDashboard /></Suspense>} />
+          <Route path="slider" element={<Suspense fallback={<PageFallback />}><AdminSliders /></Suspense>} />
+          <Route path="urunler" element={<Suspense fallback={<PageFallback />}><AdminProducts /></Suspense>} />
+          <Route path="urunler/yeni" element={<Suspense fallback={<PageFallback />}><AdminProductForm /></Suspense>} />
+          <Route path="urunler/:id" element={<Suspense fallback={<PageFallback />}><AdminProductForm /></Suspense>} />
+          <Route path="kullanicilar" element={<Suspense fallback={<PageFallback />}><AdminUsers /></Suspense>} />
+          <Route path="siparisler" element={<Suspense fallback={<PageFallback />}><AdminOrders /></Suspense>} />
+          <Route path="yorumlar" element={<Suspense fallback={<PageFallback />}><AdminReviews /></Suspense>} />
+          <Route path="kampanyalar" element={<Suspense fallback={<PageFallback />}><AdminCampaigns /></Suspense>} />
+          <Route path="loglar" element={<Suspense fallback={<PageFallback />}><AdminLogs /></Suspense>} />
+          <Route path="ayarlar" element={<Suspense fallback={<PageFallback />}><AdminSettings /></Suspense>} />
+        </Route>
         <Route path="/" element={<MainLayout />}>
           <Route index element={<HomePage />} />
           <Route path="giris" element={<LoginPage />} />
@@ -73,19 +87,6 @@ export default function App() {
           <Route path="forum" element={<Suspense fallback={<PageFallback />}><ForumPage /></Suspense>} />
           <Route path="forum/konu/:slug" element={<Suspense fallback={<PageFallback />}><ForumPage /></Suspense>} />
           <Route path="500" element={<Suspense fallback={<PageFallback />}><Error500Page /></Suspense>} />
-        </Route>
-        <Route path="/admin" element={<AdminLayout />}>
-          <Route index element={<Suspense fallback={<PageFallback />}><AdminDashboard /></Suspense>} />
-          <Route path="slider" element={<Suspense fallback={<PageFallback />}><AdminSliders /></Suspense>} />
-          <Route path="urunler" element={<Suspense fallback={<PageFallback />}><AdminProducts /></Suspense>} />
-          <Route path="urunler/yeni" element={<Suspense fallback={<PageFallback />}><AdminProductForm /></Suspense>} />
-          <Route path="urunler/:id" element={<Suspense fallback={<PageFallback />}><AdminProductForm /></Suspense>} />
-          <Route path="kullanicilar" element={<Suspense fallback={<PageFallback />}><AdminUsers /></Suspense>} />
-          <Route path="siparisler" element={<Suspense fallback={<PageFallback />}><AdminOrders /></Suspense>} />
-          <Route path="yorumlar" element={<Suspense fallback={<PageFallback />}><AdminReviews /></Suspense>} />
-          <Route path="kampanyalar" element={<Suspense fallback={<PageFallback />}><AdminCampaigns /></Suspense>} />
-          <Route path="loglar" element={<Suspense fallback={<PageFallback />}><AdminLogs /></Suspense>} />
-          <Route path="ayarlar" element={<Suspense fallback={<PageFallback />}><AdminSettings /></Suspense>} />
         </Route>
         <Route path="*" element={<NotFoundPage />} />
       </Routes>

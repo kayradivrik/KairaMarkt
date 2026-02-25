@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, Link, useLocation } from 'react-router-dom';
 import { FiGrid, FiImage, FiPackage, FiUsers, FiShoppingBag, FiMessageSquare, FiTag, FiFileText, FiSettings, FiExternalLink, FiMenu, FiX } from 'react-icons/fi';
 import { useSettings } from '../context/SettingsContext';
 import ProtectedRoute from '../components/ProtectedRoute';
@@ -22,7 +22,7 @@ const getPageTitle = (path) => {
 };
 
 function AdminSidebar({ onClose, isOpen }) {
-  const pathname = typeof window !== 'undefined' ? window.location.pathname : '';
+  const { pathname } = useLocation();
   const { primaryColor, siteName } = useSettings();
   const accent = primaryColor || '#b91c1c';
   const linkClass = (isActive) =>
@@ -65,16 +65,16 @@ function AdminSidebar({ onClose, isOpen }) {
         {links.map(({ to, icon: Icon, label }) => {
           const isActive = pathname === to;
           return (
-            <a
+            <Link
               key={to}
-              href={to}
+              to={to}
               className={linkClass(isActive)}
               style={isActive ? { backgroundColor: accent } : {}}
               onClick={onClose}
             >
               <Icon className="w-5 h-5 shrink-0" />
               {label}
-            </a>
+            </Link>
           );
         })}
       </nav>
@@ -84,7 +84,7 @@ function AdminSidebar({ onClose, isOpen }) {
 
 export default function AdminLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const pathname = typeof window !== 'undefined' ? window.location.pathname : '';
+  const { pathname } = useLocation();
   const pageTitle = getPageTitle(pathname);
 
   return (
