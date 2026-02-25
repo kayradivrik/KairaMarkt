@@ -32,6 +32,10 @@ export default function ProductDetailPage() {
   const { has, toggle } = useWishlist();
 
   useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [slug]);
+
+  useEffect(() => {
     if (!slug) return;
     const isId = /^[a-f0-9]{24}$/i.test(slug);
     const req = isId ? getProductById(slug) : getProductBySlug(slug);
