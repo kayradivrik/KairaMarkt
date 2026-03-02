@@ -36,7 +36,9 @@ export default function MainLayout() {
   const { siteName, maintenanceMode } = useSettings();
   const { isAdmin } = useAuth() || {};
 
-  const showMaintenance = maintenanceMode && !isAdmin;
+  // API bazen "true" string dönebilir; boolean gibi davran
+  const isMaintenanceOn = maintenanceMode === true || maintenanceMode === 'true';
+  const showMaintenance = Boolean(isMaintenanceOn && !isAdmin);
 
   useEffect(() => {
     const base = siteName || 'KairaMarkt';

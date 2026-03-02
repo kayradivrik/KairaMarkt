@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { getPublicSettings } from '../services/settingsService';
 
 const defaults = {
@@ -46,10 +46,21 @@ const SettingsContext = createContext(defaults);
 export function SettingsProvider({ children }) {
   const [settings, setSettings] = useState(defaults);
 
-  useEffect(() => {
+  const fetchSettings = () => {
     getPublicSettings()
       .then((r) => setSettings({ ...defaults, ...r.data?.settings }))
       .catch(() => {});
+  };
+
+  useEffect(() => {
+    fetchSettings();
+  }, []);
+
+  // Sekme tekrar odaklandığında ayarları yeniden al (bakım modu vb. güncel olsun)
+  useEffect(() => {
+    const onVisibility = () => { if (document.visibilityState === 'visible') fetchSettings(); };
+    document.addEventListener('visibilitychange', onVisibility);
+    return () => document.removeEventListener('visibilitychange', onVisibility);
   }, []);
 
   const value = { ...settings, setSettings };

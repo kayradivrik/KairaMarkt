@@ -7,6 +7,23 @@ const apiBase =
   (typeof window !== 'undefined' && window.__VITE_API_URL__) ||
   (import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL.replace(/\/$/, '')}/api` : '/api');
 
+const AUTH_TOKEN_KEY = 'auth_token';
+
+export function getStoredToken() {
+  try {
+    return localStorage.getItem(AUTH_TOKEN_KEY);
+  } catch {
+    return null;
+  }
+}
+
+export function setStoredToken(token) {
+  try {
+    if (token) localStorage.setItem(AUTH_TOKEN_KEY, token);
+    else localStorage.removeItem(AUTH_TOKEN_KEY);
+  } catch {}
+}
+
 const api = axios.create({
   baseURL: apiBase,
   withCredentials: true,
@@ -18,6 +35,8 @@ api.interceptors.request.use((config) => {
   if (config.data instanceof FormData) {
     delete config.headers['Content-Type'];
   }
+  const token = getStoredToken();
+  if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
 });
 
@@ -30,6 +49,7 @@ api.interceptors.response.use(
   async (err) => {
     const config = err.config;
     const status = err.response?.status;
+    if (status === 401) setStoredToken(null);
     const retryCount = config.__retryCount ?? 0;
 
     if (retryCount < MAX_RETRIES && (status === 429 || status === 503)) {
