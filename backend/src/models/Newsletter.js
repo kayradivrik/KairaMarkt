@@ -8,5 +8,4 @@ const newsletterSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-newsletterSchema.index({ email: 1 });
 export default mongoose.model('Newsletter', newsletterSchema);
