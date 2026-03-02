@@ -16,6 +16,7 @@ import TeslimatPage from './pages/TeslimatPage';
 import FaqPage from './pages/FaqPage';
 import CampaignsPage from './pages/CampaignsPage';
 import ReturnPage from './pages/ReturnPage';
+import ContentPage from './pages/ContentPage';
 import NotFoundPage from './pages/NotFoundPage';
 
 import AdminLayout from './layouts/AdminLayout';
@@ -37,6 +38,16 @@ const AdminLogs = lazy(() => import('./pages/admin/AdminLogs'));
 const AdminSliders = lazy(() => import('./pages/admin/AdminSliders'));
 const AdminSettings = lazy(() => import('./pages/admin/AdminSettings'));
 const AdminFaq = lazy(() => import('./pages/admin/AdminFaq'));
+const AdminReports = lazy(() => import('./pages/admin/AdminReports'));
+const AdminCoupons = lazy(() => import('./pages/admin/AdminCoupons'));
+const AdminBanners = lazy(() => import('./pages/admin/AdminBanners'));
+const AdminStockReport = lazy(() => import('./pages/admin/AdminStockReport'));
+const AdminCustomerSegments = lazy(() => import('./pages/admin/AdminCustomerSegments'));
+const AdminNotifications = lazy(() => import('./pages/admin/AdminNotifications'));
+const AdminShipping = lazy(() => import('./pages/admin/AdminShipping'));
+const AdminPayment = lazy(() => import('./pages/admin/AdminPayment'));
+const AdminContentPages = lazy(() => import('./pages/admin/AdminContentPages'));
+const AdminSystemStatus = lazy(() => import('./pages/admin/AdminSystemStatus'));
 
 function PageFallback() {
   return (
@@ -65,6 +76,16 @@ export default function App() {
           <Route path="loglar" element={<Suspense fallback={<PageFallback />}><AdminLogs /></Suspense>} />
           <Route path="sss" element={<Suspense fallback={<PageFallback />}><AdminFaq /></Suspense>} />
           <Route path="ayarlar" element={<Suspense fallback={<PageFallback />}><AdminSettings /></Suspense>} />
+          <Route path="raporlar" element={<Suspense fallback={<PageFallback />}><AdminReports /></Suspense>} />
+          <Route path="kuponlar" element={<Suspense fallback={<PageFallback />}><AdminCoupons /></Suspense>} />
+          <Route path="banner" element={<Suspense fallback={<PageFallback />}><AdminBanners /></Suspense>} />
+          <Route path="stok-raporu" element={<Suspense fallback={<PageFallback />}><AdminStockReport /></Suspense>} />
+          <Route path="musteri-segmentleri" element={<Suspense fallback={<PageFallback />}><AdminCustomerSegments /></Suspense>} />
+          <Route path="bildirimler" element={<Suspense fallback={<PageFallback />}><AdminNotifications /></Suspense>} />
+          <Route path="kargo-ayarlari" element={<Suspense fallback={<PageFallback />}><AdminShipping /></Suspense>} />
+          <Route path="odeme-ayarlari" element={<Suspense fallback={<PageFallback />}><AdminPayment /></Suspense>} />
+          <Route path="icerik-sayfalari" element={<Suspense fallback={<PageFallback />}><AdminContentPages /></Suspense>} />
+          <Route path="sistem-durumu" element={<Suspense fallback={<PageFallback />}><AdminSystemStatus /></Suspense>} />
         </Route>
         <Route path="/" element={<MainLayout />}>
           <Route index element={<HomePage />} />
@@ -88,6 +109,7 @@ export default function App() {
           <Route path="kullanim-kosullari" element={<Suspense fallback={<PageFallback />}><KullanimKosullariPage /></Suspense>} />
           <Route path="forum" element={<Suspense fallback={<PageFallback />}><ForumPage /></Suspense>} />
           <Route path="forum/konu/:slug" element={<Suspense fallback={<PageFallback />}><ForumPage /></Suspense>} />
+          <Route path="sayfa/:slug" element={<ContentPage />} />
           <Route path="500" element={<Suspense fallback={<PageFallback />}><Error500Page /></Suspense>} />
         </Route>
         <Route path="*" element={<NotFoundPage />} />

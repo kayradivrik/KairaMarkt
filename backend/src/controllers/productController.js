@@ -31,12 +31,26 @@ export const getProducts = async (req, res, next) => {
     const { search, category, brand, minPrice, maxPrice, rating, featured, sort = 'new', page = 1, limit = 12 } = req.query;
     const filter = buildQuery({ category, brand, minPrice, maxPrice, rating, featured });
     if (search?.trim()) filter.$text = { $search: search.trim() };
-    const skip = (Math.max(1, parseInt(page)) - 1) * Math.min(50, Math.max(1, parseInt(limit)));
-    const [products, total] = await Promise.all([
-      Product.find(filter).sort(getSort(sort)).skip(skip).limit(Math.min(50, Math.max(1, parseInt(limit)))).lean(),
-      Product.countDocuments(filter),
-    ]);
-    res.json({ success: true, products, total, page: parseInt(page) || 1, limit: parseInt(limit) || 12 });
+    const limitNum = Math.min(50, Math.max(1, parseInt(limit)) || 12);
+    const skip = (Math.max(1, parseInt(page)) - 1) * limitNum;
+    const pageNum = parseInt(page) || 1;
+    const sortOpt = getSort(sort);
+
+    const items = await Product.find(filter).sort(sortOpt).skip(skip).limit(limitNum + 1).lean();
+    const hasMore = items.length > limitNum;
+    const products = hasMore ? items.slice(0, limitNum) : items;
+    let total;
+    if (pageNum === 1) {
+      try {
+        total = await Product.countDocuments(filter).maxTimeMS(3000);
+      } catch {
+        total = hasMore ? limitNum + 1 : products.length;
+      }
+    } else {
+      total = hasMore ? pageNum * limitNum + 1 : (pageNum - 1) * limitNum + products.length;
+    }
+
+    res.json({ success: true, products, total, hasMore, page: pageNum, limit: limitNum });
   } catch (err) {
     next(err);
   }

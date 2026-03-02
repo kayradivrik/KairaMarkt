@@ -32,6 +32,11 @@ const productSchema = new mongoose.Schema(
 
 productSchema.index({ name: 'text', description: 'text', brand: 'text' });
 productSchema.index({ category: 1, price: 1 });
+productSchema.index({ isActive: 1, createdAt: -1 });
+productSchema.index({ isActive: 1, salesCount: -1 });
+productSchema.index({ isActive: 1, price: 1 });
+productSchema.index({ isActive: 1, rating: -1 });
+productSchema.index({ isActive: 1, featured: 1 });
 productSchema.pre('save', function (next) {
   if (this.isModified('name') && !this.slug) {
     this.slug = this.name

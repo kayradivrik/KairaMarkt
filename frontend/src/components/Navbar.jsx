@@ -37,7 +37,7 @@ export default function Navbar() {
   const { items, itemCount } = useCart();
   const { cartIconRef } = useFlyToCart() || {};
   const { dark, toggle } = useTheme();
-  const { siteName, logoUrl, showLogo, primaryColor } = useSettings();
+  const { siteName, logoUrl, showLogo, primaryColor, customNavLinks } = useSettings();
   const navigate = useNavigate();
   const brandColor = primaryColor || '#b91c1c';
 
@@ -108,6 +108,17 @@ export default function Navbar() {
             <Link to="/sss" className="px-3 py-2 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-ux">SSS</Link>
             <Link to="/forum" className="px-3 py-2 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-ux">Forum</Link>
             <Link to="/iletisim" className="px-3 py-2 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-ux">İletişim</Link>
+            {(customNavLinks || []).map((link) => (
+              <a
+                key={`${link.label}-${link.href}`}
+                href={link.href}
+                target={link.external ? '_blank' : '_self'}
+                rel={link.external ? 'noreferrer' : undefined}
+                className="px-3 py-2 rounded-full text-sm font-semibold border border-theme/70 text-theme bg-theme/5 hover:bg-theme/10 transition-ux"
+              >
+                {link.label}
+              </a>
+            ))}
           </nav>
 
           <form onSubmit={handleSearch} className="hidden md:flex flex-1 max-w-md mx-4">
@@ -320,6 +331,19 @@ export default function Navbar() {
                       İade
                     </Link>
                   </li>
+                  {(customNavLinks || []).map((link) => (
+                    <li key={`${link.label}-${link.href}`}>
+                      <a
+                        href={link.href}
+                        target={link.external ? '_blank' : '_self'}
+                        rel={link.external ? 'noreferrer' : undefined}
+                        onClick={closeMenu(setOpen)}
+                        className="flex items-center gap-3 px-4 py-3.5 rounded-xl font-semibold text-theme border border-theme/60 active:bg-theme-subtle transition-colors"
+                      >
+                        {link.label}
+                      </a>
+                    </li>
+                  ))}
                   <li>
                     <Link to="/iletisim" onClick={closeMenu(setOpen)} className="flex items-center gap-3 px-4 py-3.5 rounded-xl text-gray-800 dark:text-gray-200 font-medium active:bg-gray-100 dark:active:bg-gray-800 transition-colors">
                       İletişim

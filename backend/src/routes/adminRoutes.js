@@ -34,6 +34,26 @@ import {
   duplicateProduct,
   bulkUpdateOrderStatus,
   exportOrdersCsv,
+  getAdminCoupons,
+  createCoupon,
+  updateCoupon,
+  deleteCoupon,
+  getAdminBanners,
+  createBanner,
+  updateBanner,
+  deleteBanner,
+  getStockReport,
+  getCustomerSegments,
+  getNotificationSettings,
+  updateNotificationSettings,
+  getShippingSettings,
+  updateShippingSettings,
+  getPaymentSettings,
+  updatePaymentSettings,
+  getContentPages,
+  upsertContentPage,
+  deleteContentPage,
+  getSystemStatus,
 } from '../controllers/adminController.js';
 
 const router = express.Router();
@@ -80,5 +100,44 @@ router.put('/faq/:id', updateFaq);
 router.delete('/faq/:id', deleteFaq);
 
 router.post('/products/:id/duplicate', duplicateProduct);
+
+// Coupons
+router.get('/coupons', getAdminCoupons);
+router.post('/coupons', createCoupon);
+router.put('/coupons/:id', updateCoupon);
+router.delete('/coupons/:id', deleteCoupon);
+
+// Banners
+router.get('/banners', getAdminBanners);
+router.post('/banners', createBanner);
+router.put('/banners/:id', updateBanner);
+router.delete('/banners/:id', deleteBanner);
+
+// Stock report
+router.get('/stock-report', getStockReport);
+
+// Customer segments
+router.get('/customer-segments', getCustomerSegments);
+
+// Notification settings
+router.get('/notification-settings', getNotificationSettings);
+router.put('/notification-settings', updateNotificationSettings);
+
+// Shipping settings
+router.get('/shipping-settings', getShippingSettings);
+router.put('/shipping-settings', updateShippingSettings);
+
+// Payment settings
+router.get('/payment-settings', getPaymentSettings);
+router.put('/payment-settings', updatePaymentSettings);
+
+// Content pages
+router.get('/content-pages', getContentPages);
+router.post('/content-pages', upsertContentPage);
+router.put('/content-pages', upsertContentPage);
+router.delete('/content-pages/:id', deleteContentPage);
+
+// System status
+router.get('/system-status', getSystemStatus);
 
 export default router;

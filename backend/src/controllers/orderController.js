@@ -1,6 +1,7 @@
 import Order from '../models/Order.js';
 import Product from '../models/Product.js';
 import Campaign from '../models/Campaign.js';
+import ShippingSettings from '../models/ShippingSettings.js';
 
 const TAX_RATE = 0.18;
 
@@ -42,13 +43,30 @@ export const createOrder = async (req, res, next) => {
     }
     const afterDiscount = subtotal - discount;
     const tax = Math.round(afterDiscount * TAX_RATE * 100) / 100;
-    const total = afterDiscount + tax;
+
+    // Kargo ayarlarını uygula
+    let shippingFee = 0;
+    try {
+      const ship = await ShippingSettings.findOne().lean();
+      if (ship) {
+        if (ship.freeShippingThreshold && afterDiscount >= ship.freeShippingThreshold) {
+          shippingFee = 0;
+        } else {
+          shippingFee = ship.defaultShippingFee || 0;
+        }
+      }
+    } catch {
+      shippingFee = 0;
+    }
+
+    const total = afterDiscount + tax + shippingFee;
     const order = await Order.create({
       user: req.user._id,
       items: orderItems,
       subtotal,
       tax,
       discount,
+      shippingFee,
       total,
       couponCode: couponCode || null,
       shippingAddress: shippingAddress || {},

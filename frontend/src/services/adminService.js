@@ -38,3 +38,41 @@ export const createFaq = (data) => admin.post('/admin/faq', data);
 export const updateFaq = (id, data) => admin.put(`/admin/faq/${id}`, data);
 export const deleteFaq = (id) => admin.delete(`/admin/faq/${id}`);
 export const duplicateProduct = (id) => admin.post(`/admin/products/${id}/duplicate`);
+
+// Coupons
+export const getAdminCoupons = () => admin.get('/admin/coupons');
+export const createAdminCoupon = (data) => admin.post('/admin/coupons', data);
+export const updateAdminCoupon = (id, data) => admin.put(`/admin/coupons/${id}`, data);
+export const deleteAdminCoupon = (id) => admin.delete(`/admin/coupons/${id}`);
+
+// Banners
+export const getAdminBanners = () => admin.get('/admin/banners');
+export const createAdminBanner = (data) => admin.post('/admin/banners', data);
+export const updateAdminBanner = (id, data) => admin.put(`/admin/banners/${id}`, data);
+export const deleteAdminBanner = (id) => admin.delete(`/admin/banners/${id}`);
+
+// Stock report
+export const getStockReport = () => admin.get('/admin/stock-report');
+
+// Customer segments
+export const getCustomerSegments = () => admin.get('/admin/customer-segments');
+
+// Notification settings
+export const getNotificationSettings = () => admin.get('/admin/notification-settings');
+export const updateNotificationSettings = (data) => admin.put('/admin/notification-settings', data);
+
+// Shipping settings
+export const getShippingSettings = () => admin.get('/admin/shipping-settings');
+export const updateShippingSettings = (data) => admin.put('/admin/shipping-settings', data);
+
+// Payment settings
+export const getPaymentSettings = () => admin.get('/admin/payment-settings');
+export const updatePaymentSettings = (data) => admin.put('/admin/payment-settings', data);
+
+// Content pages
+export const getContentPages = () => admin.get('/admin/content-pages');
+export const upsertContentPage = (data) => admin.post('/admin/content-pages', data);
+export const deleteContentPage = (id) => admin.delete(`/admin/content-pages/${id}`);
+
+// System status
+export const getSystemStatus = () => admin.get('/admin/system-status');

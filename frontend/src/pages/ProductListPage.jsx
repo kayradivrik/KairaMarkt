@@ -19,6 +19,7 @@ export default function ProductListPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [products, setProducts] = useState([]);
   const [total, setTotal] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
   const [categories, setCategories] = useState([]);
   const [brands, setBrands] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -57,8 +58,9 @@ export default function ProductListPage() {
     getProducts(query)
       .then((r) => {
         const list = r.data.products || [];
-        const totalCount = r.data.total || 0;
+        const totalCount = r.data.total ?? 0;
         setTotal(totalCount);
+        setHasMore(r.data.hasMore ?? (totalCount > (pageNum - 1) * limit + list.length));
         setProducts((prev) => (isAppend ? [...prev, ...list] : list));
       })
       .catch(() => !isAppend && setProducts([]))
@@ -81,16 +83,15 @@ export default function ProductListPage() {
       (entries) => {
         const [e] = entries;
         if (!e?.isIntersecting || loading || loadingMore) return;
-        const hasMore = products.length < total;
         if (hasMore) setPage((p) => p + 1);
       },
       { rootMargin: `${THRESHOLD}px`, threshold: 0 }
     );
     observer.observe(sentinel);
     return () => observer.disconnect();
-  }, [loading, loadingMore, products.length, total]);
+  }, [loading, loadingMore, hasMore]);
 
-  const hasMore = products.length < total && total > 0;
+  const showHasMore = hasMore;
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -158,7 +159,7 @@ export default function ProductListPage() {
                   {[...Array(4)].map((_, i) => <ProductCardSkeleton key={i} />)}
                 </div>
               )}
-              {!hasMore && products.length > 0 && <p className="text-center text-gray-500 dark:text-gray-400 text-sm mt-6">Tüm ürünler listelendi.</p>}
+              {!showHasMore && products.length > 0 && <p className="text-center text-gray-500 dark:text-gray-400 text-sm mt-6">Tüm ürünler listelendi.</p>}
             </>
           ) : (
             <p className="text-gray-500 py-12 text-center">Ürün bulunamadı.</p>

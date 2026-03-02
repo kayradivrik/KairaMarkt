@@ -28,6 +28,7 @@ import settingsRoutes from './routes/settingsRoutes.js';
 import newsletterRoutes from './routes/newsletterRoutes.js';
 import contactRoutes from './routes/contactRoutes.js';
 import stockAlertRoutes from './routes/stockAlertRoutes.js';
+import contentPageRoutes from './routes/contentPageRoutes.js';
 
 await connectDB();
 
@@ -95,6 +96,7 @@ app.use('/api/settings', settingsRoutes);
 app.use('/api/newsletter', newsletterRoutes);
 app.use('/api/contact', contactRoutes);
 app.use('/api/stock-alert', stockAlertRoutes);
+app.use('/api/pages', contentPageRoutes);
 
 app.get('/api/health', (_, res) => res.json({ ok: true }));
 

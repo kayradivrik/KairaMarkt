@@ -39,6 +39,13 @@ const siteSettingsSchema = new mongoose.Schema(
     announcementBarText: { type: String, default: '' },
     announcementBarEnabled: { type: Boolean, default: false },
     maintenanceMode: { type: Boolean, default: false },
+    customNavLinks: [
+      {
+        label: { type: String, default: '' },
+        href: { type: String, default: '' },
+        external: { type: Boolean, default: false },
+      },
+    ],
   },
   { timestamps: true }
 );

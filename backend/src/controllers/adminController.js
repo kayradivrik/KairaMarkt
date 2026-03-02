@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import User from '../models/User.js';
 import Product from '../models/Product.js';
 import Order from '../models/Order.js';
@@ -7,6 +8,13 @@ import AdminLog from '../models/AdminLog.js';
 import Slider from '../models/Slider.js';
 import Faq from '../models/Faq.js';
 import SiteSettings from '../models/SiteSettings.js';
+import Coupon from '../models/Coupon.js';
+import Banner from '../models/Banner.js';
+import NotificationSettings from '../models/NotificationSettings.js';
+import ShippingSettings from '../models/ShippingSettings.js';
+import PaymentSettings from '../models/PaymentSettings.js';
+import ContentPage from '../models/ContentPage.js';
+import CustomerSegment from '../models/CustomerSegment.js';
 
 const logAction = (adminId, action, target, details = {}, ip = '') => {
   return AdminLog.create({ admin: adminId, action, target, details, ip });
@@ -406,6 +414,7 @@ const SETTINGS_DEFAULTS = {
   announcementBarText: '',
   announcementBarEnabled: false,
   maintenanceMode: false,
+  customNavLinks: [],
 };
 
 export const getSettings = async (_req, res, next) => {
@@ -458,6 +467,15 @@ export const updateSettings = async (req, res, next) => {
     if (body.announcementBarText != null) update.announcementBarText = String(body.announcementBarText).trim();
     if (body.announcementBarEnabled != null) update.announcementBarEnabled = !!body.announcementBarEnabled;
     if (body.maintenanceMode != null) update.maintenanceMode = !!body.maintenanceMode;
+    if (Array.isArray(body.customNavLinks)) {
+      update.customNavLinks = body.customNavLinks
+        .map((l) => ({
+          label: String(l.label || '').trim(),
+          href: String(l.href || '').trim(),
+          external: !!l.external,
+        }))
+        .filter((l) => l.label && l.href);
+    }
     const doc = await SiteSettings.findOneAndUpdate({}, { $set: update }, { new: true, upsert: true }).lean();
     await logAction(req.user._id, 'UPDATE_SETTINGS', 'site', update, req.ip);
     res.json({ success: true, settings: { ...SETTINGS_DEFAULTS, ...doc } });
@@ -539,3 +557,308 @@ export const duplicateProduct = async (req, res, next) => {
     next(err);
   }
 };
+
+// ---- Coupons ----
+
+export const getAdminCoupons = async (_req, res, next) => {
+  try {
+    const list = await Coupon.find().sort({ createdAt: -1 }).lean();
+    res.json({ success: true, coupons: list });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const createCoupon = async (req, res, next) => {
+  try {
+    const coupon = await Coupon.create(req.body || {});
+    await logAction(req.user._id, 'CREATE_COUPON', coupon.code, { id: coupon._id }, req.ip);
+    res.status(201).json({ success: true, coupon });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const updateCoupon = async (req, res, next) => {
+  try {
+    const coupon = await Coupon.findByIdAndUpdate(req.params.id, req.body || {}, { new: true }).lean();
+    if (!coupon) return res.status(404).json({ success: false, message: 'Kupon bulunamadı' });
+    res.json({ success: true, coupon });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const deleteCoupon = async (req, res, next) => {
+  try {
+    await Coupon.findByIdAndDelete(req.params.id);
+    res.json({ success: true });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// ---- Banners ----
+
+export const getAdminBanners = async (_req, res, next) => {
+  try {
+    const list = await Banner.find().sort({ position: 1, order: 1 }).lean();
+    res.json({ success: true, banners: list });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const createBanner = async (req, res, next) => {
+  try {
+    const banner = await Banner.create(req.body || {});
+    await logAction(req.user._id, 'CREATE_BANNER', banner._id.toString(), {}, req.ip);
+    res.status(201).json({ success: true, banner });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const updateBanner = async (req, res, next) => {
+  try {
+    const banner = await Banner.findByIdAndUpdate(req.params.id, req.body || {}, { new: true }).lean();
+    if (!banner) return res.status(404).json({ success: false, message: 'Banner bulunamadı' });
+    res.json({ success: true, banner });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const deleteBanner = async (req, res, next) => {
+  try {
+    await Banner.findByIdAndDelete(req.params.id);
+    res.json({ success: true });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// ---- Stock report ----
+
+export const getStockReport = async (_req, res, next) => {
+  try {
+    const lowStock = await Product.find({ stock: { $lte: LOW_STOCK_THRESHOLD }, isActive: true })
+      .select('name stock price category')
+      .sort({ stock: 1 })
+      .lean();
+    const totals = await Product.aggregate([
+      { $group: { _id: null, count: { $sum: 1 }, totalStock: { $sum: '$stock' }, totalValue: { $sum: { $multiply: ['$stock', '$price'] } } } },
+    ]);
+    const summary = totals[0] || { count: 0, totalStock: 0, totalValue: 0 };
+    res.json({ success: true, lowStock, summary });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// ---- Customer segments ----
+
+export const getCustomerSegments = async (_req, res, next) => {
+  try {
+    const stored = await CustomerSegment.find().sort({ createdAt: -1 }).lean();
+    // Basit otomatik segment örnekleri (sadece sayısal)
+    const vipCount = await Order.countDocuments({ total: { $gte: 5000 } });
+    const frequentCount = await Order.countDocuments({ 'items.3': { $exists: true } });
+    const oneTimeCount = await Order.countDocuments({ repeatCustomer: false }).catch(() => 0);
+    res.json({
+      success: true,
+      segments: stored,
+      autoSegments: [
+        { key: 'vip', name: 'VIP müşteriler', count: vipCount },
+        { key: 'frequent', name: 'Sık alışveriş yapanlar', count: frequentCount },
+        { key: 'oneTime', name: 'Tek seferlik müşteriler', count: oneTimeCount },
+      ],
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// ---- Notification settings ----
+
+export const getNotificationSettings = async (_req, res, next) => {
+  try {
+    const doc = await NotificationSettings.findOne().lean();
+    res.json({
+      success: true,
+      settings: doc || {
+        orderEmailsEnabled: true,
+        lowStockEmailsEnabled: true,
+        systemEmailsEnabled: true,
+        adminEmail: '',
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const updateNotificationSettings = async (req, res, next) => {
+  try {
+    const body = req.body || {};
+    const update = {
+      orderEmailsEnabled: !!body.orderEmailsEnabled,
+      lowStockEmailsEnabled: !!body.lowStockEmailsEnabled,
+      systemEmailsEnabled: !!body.systemEmailsEnabled,
+      adminEmail: body.adminEmail || '',
+    };
+    const doc = await NotificationSettings.findOneAndUpdate({}, { $set: update }, { new: true, upsert: true }).lean();
+    res.json({ success: true, settings: doc });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// ---- Shipping settings ----
+
+export const getShippingSettings = async (_req, res, next) => {
+  try {
+    const doc = await ShippingSettings.findOne().lean();
+    res.json({
+      success: true,
+      settings: doc || {
+        freeShippingThreshold: 0,
+        defaultShippingFee: 0,
+        carrierName: '',
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const updateShippingSettings = async (req, res, next) => {
+  try {
+    const body = req.body || {};
+    const update = {
+      freeShippingThreshold: Number(body.freeShippingThreshold) || 0,
+      defaultShippingFee: Number(body.defaultShippingFee) || 0,
+      carrierName: body.carrierName || '',
+    };
+    const doc = await ShippingSettings.findOneAndUpdate({}, { $set: update }, { new: true, upsert: true }).lean();
+    res.json({ success: true, settings: doc });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// ---- Payment settings ----
+
+export const getPaymentSettings = async (_req, res, next) => {
+  try {
+    const doc = await PaymentSettings.findOne().lean();
+    res.json({
+      success: true,
+      settings: doc || {
+        providerName: '',
+        installmentsEnabled: false,
+        cashOnDeliveryEnabled: false,
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const updatePaymentSettings = async (req, res, next) => {
+  try {
+    const body = req.body || {};
+    const update = {
+      providerName: body.providerName || '',
+      installmentsEnabled: !!body.installmentsEnabled,
+      cashOnDeliveryEnabled: !!body.cashOnDeliveryEnabled,
+    };
+    const doc = await PaymentSettings.findOneAndUpdate({}, { $set: update }, { new: true, upsert: true }).lean();
+    res.json({ success: true, settings: doc });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// ---- Content pages ----
+
+export const getContentPages = async (_req, res, next) => {
+  try {
+    const pages = await ContentPage.find().sort({ createdAt: -1 }).lean();
+    res.json({ success: true, pages });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const upsertContentPage = async (req, res, next) => {
+  try {
+    const { slug, title, body, isPublished } = req.body || {};
+    if (!slug || !title) {
+      return res.status(400).json({ success: false, message: 'slug ve başlık gerekli' });
+    }
+    const normalizedSlug = String(slug)
+      .trim()
+      .toLowerCase()
+      .replace(/\s+/g, '-')
+      .replace(/[^a-z0-9\-]/g, '');
+    const page = await ContentPage.findOneAndUpdate(
+      { slug: normalizedSlug },
+      { $set: { slug: normalizedSlug, title, body: body || '', isPublished: isPublished !== false } },
+      { new: true, upsert: true }
+    ).lean();
+    res.json({ success: true, page });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const deleteContentPage = async (req, res, next) => {
+  try {
+    await ContentPage.findByIdAndDelete(req.params.id);
+    res.json({ success: true });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// ---- System status ----
+
+export const getSystemStatus = async (_req, res, next) => {
+  try {
+    const dbState = mongoose.connection.readyState;
+    let dbStatus = 'unknown';
+    if (dbState === 1) dbStatus = 'up';
+    else if (dbState === 2) dbStatus = 'connecting';
+    else if (dbState === 0) dbStatus = 'down';
+
+    // Basit bir sipariş sorgusu ile okuma testi (hata olursa catch bloğuna düşer)
+    let canQueryOrders = false;
+    try {
+      await Order.findOne().select('_id').lean();
+      canQueryOrders = true;
+    } catch {
+      canQueryOrders = false;
+    }
+
+    res.json({
+      success: true,
+      services: [
+        { key: 'api', label: 'API', status: 'up' },
+        {
+          key: 'db',
+          label: 'Veritabanı',
+          status: dbStatus,
+        },
+        {
+          key: 'ordersQuery',
+          label: 'Sipariş sorgusu',
+          status: canQueryOrders ? 'up' : 'down',
+        },
+      ],
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+

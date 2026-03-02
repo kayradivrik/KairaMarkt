@@ -40,12 +40,14 @@ export default function AdminFaq() {
     const api = editing ? updateFaq(editing, payload) : createFaq(payload);
     api
       .then(() => { toast.success(editing ? 'Güncellendi' : 'Eklendi'); setEditing(null); load(); })
-      .catch((e) => toast.error(e.message));
+      .catch((e) => toast.error(e?.response?.data?.message || e.message || 'Kayıt başarısız'));
   };
 
   const remove = (id) => {
     if (!window.confirm('Bu SSS kaydını silmek istediğinize emin misiniz?')) return;
-    deleteFaq(id).then(() => { toast.success('Silindi'); load(); }).catch((e) => toast.error(e.message));
+    deleteFaq(id)
+      .then(() => { toast.success('Silindi'); load(); })
+      .catch((e) => toast.error(e?.response?.data?.message || e.message || 'Silme başarısız'));
   };
 
   if (loading) {

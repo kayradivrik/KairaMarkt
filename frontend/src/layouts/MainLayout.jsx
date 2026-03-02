@@ -6,6 +6,7 @@ import ScrollToTop from '../components/ScrollToTop';
 import RouteChangeProgressBar from '../components/RouteChangeProgressBar';
 import CookieConsent from '../components/CookieConsent';
 import AnnouncementBar from '../components/AnnouncementBar';
+import AiAssistantWidget from '../components/AiAssistantWidget';
 import MaintenancePage from '../pages/MaintenancePage';
 import { useSettings } from '../context/SettingsContext';
 import { useAuth } from '../context/AuthContext';
@@ -72,6 +73,7 @@ export default function MainLayout() {
       </main>
       <Footer />
       <ScrollToTop />
+      <AiAssistantWidget />
       <CookieConsent />
     </div>
   );

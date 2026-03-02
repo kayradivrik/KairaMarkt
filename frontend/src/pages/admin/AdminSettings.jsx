@@ -42,6 +42,7 @@ const defaultSettings = {
   announcementBarText: '',
   announcementBarEnabled: false,
   maintenanceMode: false,
+  customNavLinks: [],
 };
 
 function Field({ label, children }) {
@@ -108,6 +109,7 @@ export default function AdminSettings() {
     announcementBarText: settings.announcementBarText,
     announcementBarEnabled: settings.announcementBarEnabled,
     maintenanceMode: settings.maintenanceMode,
+    customNavLinks: settings.customNavLinks,
   });
 
   const handleSubmit = (e) => {
@@ -231,6 +233,86 @@ export default function AdminSettings() {
               placeholder="Site tanımı"
             />
           </Field>
+        </div>
+
+        <div className={sectionClass}>
+          <h2 className="font-semibold text-gray-900 dark:text-white flex items-center gap-2 mb-2">
+            <FiLink className="w-5 h-5" /> Navbar linkleri
+          </h2>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">
+            Buradan navbarda ekstra linkler tanımlayabilirsiniz. İç linkler için <code className="font-mono text-xs bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded">/sayfa/slug</code>,
+            dış linkler için tam URL (<code className="font-mono text-xs">https://...</code>) yazın.
+          </p>
+          <div className="space-y-3">
+            {(settings.customNavLinks || []).map((link, idx) => (
+              <div key={idx} className="flex flex-col sm:flex-row gap-2 items-start sm:items-center">
+                <input
+                  type="text"
+                  value={link.label || ''}
+                  onChange={(e) =>
+                    setSettings((s) => {
+                      const next = [...(s.customNavLinks || [])];
+                      next[idx] = { ...next[idx], label: e.target.value };
+                      return { ...s, customNavLinks: next };
+                    })
+                  }
+                  className={`sm:w-40 ${inputClass} text-sm`}
+                  placeholder="Başlık"
+                />
+                <input
+                  type="text"
+                  value={link.href || ''}
+                  onChange={(e) =>
+                    setSettings((s) => {
+                      const next = [...(s.customNavLinks || [])];
+                      next[idx] = { ...next[idx], href: e.target.value };
+                      return { ...s, customNavLinks: next };
+                    })
+                  }
+                  className={`flex-1 ${inputClass} text-sm`}
+                  placeholder="/sayfa/icerik-sayfalari veya https://..."
+                />
+                <label className="inline-flex items-center gap-1 text-xs text-gray-600 dark:text-gray-300">
+                  <input
+                    type="checkbox"
+                    checked={!!link.external}
+                    onChange={(e) =>
+                      setSettings((s) => {
+                        const next = [...(s.customNavLinks || [])];
+                        next[idx] = { ...next[idx], external: e.target.checked };
+                        return { ...s, customNavLinks: next };
+                      })
+                    }
+                  />
+                  Yeni sekme
+                </label>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setSettings((s) => ({
+                      ...s,
+                      customNavLinks: (s.customNavLinks || []).filter((_, i) => i !== idx),
+                    }))
+                  }
+                  className="text-xs text-red-600 hover:underline"
+                >
+                  Sil
+                </button>
+              </div>
+            ))}
+            <button
+              type="button"
+              onClick={() =>
+                setSettings((s) => ({
+                  ...s,
+                  customNavLinks: [...(s.customNavLinks || []), { label: '', href: '', external: false }],
+                }))
+              }
+              className="mt-1 inline-flex items-center gap-1 text-xs text-theme hover:underline"
+            >
+              + Yeni link ekle
+            </button>
+          </div>
         </div>
 
         <div className={sectionClass}>

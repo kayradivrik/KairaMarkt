@@ -39,6 +39,7 @@ const defaults = {
   announcementBarText: '',
   announcementBarEnabled: false,
   maintenanceMode: false,
+  customNavLinks: [],
 };
 
 const SettingsContext = createContext(defaults);

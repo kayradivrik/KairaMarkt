@@ -38,6 +38,7 @@ const DEFAULTS = {
   announcementBarText: '',
   announcementBarEnabled: false,
   maintenanceMode: false,
+  customNavLinks: [],
 };
 
 export const getPublicSettings = async (_req, res, next) => {

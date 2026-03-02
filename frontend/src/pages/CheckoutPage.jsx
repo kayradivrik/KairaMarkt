@@ -82,7 +82,8 @@ function CheckoutForm() {
   const [orderId, setOrderId] = useState(null);
 
   const totalWithoutCoupon = subtotal + tax;
-  const total = Math.max(0, totalWithoutCoupon - couponDiscount);
+  const [shippingFee, setShippingFee] = useState(0);
+  const total = Math.max(0, totalWithoutCoupon - couponDiscount + shippingFee);
 
   const handleValidateCoupon = () => {
     if (!couponCode.trim()) return;

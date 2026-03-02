@@ -1,6 +1,29 @@
 import { useState } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import { FiGrid, FiImage, FiPackage, FiUsers, FiShoppingBag, FiMessageSquare, FiTag, FiFileText, FiSettings, FiExternalLink, FiMenu, FiX, FiHelpCircle } from 'react-icons/fi';
+import {
+  FiGrid,
+  FiImage,
+  FiPackage,
+  FiUsers,
+  FiShoppingBag,
+  FiMessageSquare,
+  FiTag,
+  FiFileText,
+  FiSettings,
+  FiExternalLink,
+  FiMenu,
+  FiX,
+  FiHelpCircle,
+  FiBarChart2,
+  FiPercent,
+  FiLayers,
+  FiTrendingUp,
+  FiBell,
+  FiTruck,
+  FiCreditCard,
+  FiFile,
+  FiActivity,
+} from 'react-icons/fi';
 import { useSettings } from '../context/SettingsContext';
 import ProtectedRoute from '../components/ProtectedRoute';
 
@@ -15,6 +38,16 @@ const links = [
   { to: '/admin/loglar', icon: FiFileText, label: 'Loglar' },
   { to: '/admin/sss', icon: FiHelpCircle, label: 'SSS' },
   { to: '/admin/ayarlar', icon: FiSettings, label: 'Site ayarları' },
+  { to: '/admin/raporlar', icon: FiBarChart2, label: 'Raporlar' },
+  { to: '/admin/kuponlar', icon: FiPercent, label: 'Kuponlar' },
+  { to: '/admin/banner', icon: FiLayers, label: 'Bannerlar' },
+  { to: '/admin/stok-raporu', icon: FiTrendingUp, label: 'Stok raporu' },
+  { to: '/admin/musteri-segmentleri', icon: FiUsers, label: 'Müşteri segmentleri' },
+  { to: '/admin/bildirimler', icon: FiBell, label: 'Bildirimler' },
+  { to: '/admin/kargo-ayarlari', icon: FiTruck, label: 'Kargo ayarları' },
+  { to: '/admin/odeme-ayarlari', icon: FiCreditCard, label: 'Ödeme ayarları' },
+  { to: '/admin/icerik-sayfalari', icon: FiFile, label: 'İçerik sayfaları' },
+  { to: '/admin/sistem-durumu', icon: FiActivity, label: 'Sistem durumu' },
 ];
 
 const getPageTitle = (path) => {
